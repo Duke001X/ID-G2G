@@ -122,14 +122,39 @@ table.exp tr:hover td{background:rgba(255,255,255,0.02)}
 </div>
 
 <div class="main-tabs">
-  <div class="mt active" onclick="switchTab('t1')">📊 Compare</div>
+  <div class="mt active" onclick="switchTab('t0')">⚡ Summary</div>
+  <div class="mt" onclick="switchTab('t1')">📊 Compare</div>
   <div class="mt" onclick="switchTab('t2')">🔍 Explorer</div>
   <div class="mt" onclick="switchTab('t3')">🎨 Creative Type</div>
   <div class="mt" onclick="switchTab('t4')">📦 Products</div>
 </div>
 
+<!-- TAB0: Summary -->
+<div id="t0" class="tc active">
+  <div class="filters">
+    <div class="fg"><div class="flbl">Account</div><div class="chip-row" id="t0-acc">
+      <button class="chip acc active" data-v="TT1" onclick="t0Acc('TT1')">TT1</button>
+      <button class="chip acc" data-v="TT2" onclick="t0Acc('TT2')">TT2</button>
+      <button class="chip acc" data-v="TT4" onclick="t0Acc('TT4')">TT4</button>
+      <button class="chip acc" data-v="TT5" onclick="t0Acc('TT5')">TT5</button>
+      <button class="chip acc" data-v="TT6" onclick="t0Acc('TT6')">TT6</button>
+      <button class="chip acc" data-v="TT7" onclick="t0Acc('TT7')">TT7</button>
+      <button class="chip acc" data-v="TT8" onclick="t0Acc('TT8')">TT8</button>
+    </div></div>
+    <div class="fg"><div class="flbl">Month</div><div class="chip-row" id="t0-mo">
+      <button class="chip active" data-v="ALL" onclick="t0Mo('ALL')">All</button>
+      <button class="chip" data-v="2026-03" onclick="t0Mo('2026-03')">Mar</button>
+      <button class="chip" data-v="2026-04" onclick="t0Mo('2026-04')">Apr</button>
+      <button class="chip" data-v="2026-05" onclick="t0Mo('2026-05')">May</button>
+      <button class="chip" data-v="2026-06" onclick="t0Mo('2026-06')">Jun</button>
+      <button class="chip" data-v="2026-07" onclick="t0Mo('2026-07')">Jul</button>
+    </div></div>
+  </div>
+  <div style="padding:14px 20px" id="t0-body"></div>
+</div>
+
 <!-- TAB1 -->
-<div id="t1" class="tc active">
+<div id="t1" class="tc">
   <div class="filters" id="t1f">
     <div class="fg"><div class="flbl">Account</div><div class="chip-row" id="t1-acc">
       <button class="chip acc active" data-v="ALL" onclick="t1Acc('ALL')">All</button>
@@ -247,11 +272,11 @@ table.exp tr:hover td{background:rgba(255,255,255,0.02)}
     </div></div>
     <div class="fg"><div class="flbl">Metric</div>
       <select class="hm-sel" id="t3-metric" onchange="renderT3()">
-        <option value="ROI">ROI</option><option value="rev">GMV ($)</option>
-        <option value="cost">Spend ($)</option><option value="CTR">CTR%</option>
-        <option value="CVR">CVR%</option><option value="entry">Entry Rate%</option>
-        <option value="ret10">10s Retention%</option><option value="CPM">CPM</option>
-        <option value="n">Creatives</option>
+        <option value="ROI">ROI</option><option value="imp">Impressions</option>
+        <option value="rev">GMV ($)</option><option value="cost">Spend ($)</option>
+        <option value="CTR">CTR%</option><option value="CVR">CVR%</option>
+        <option value="entry">Entry Rate%</option><option value="ret10">10s Retention%</option>
+        <option value="CPM">CPM</option><option value="n">Creatives</option>
       </select>
     </div>
     <button class="reset" onclick="t3Reset()">↺ Reset</button>
@@ -827,11 +852,218 @@ function t4Reset(){
   renderT4List();
 }
 
+// ── Tab0 Summary ──
+let t0Acct='TT1', t0Ms=new Set(['ALL']);
+
+function t0Acc(v){
+  t0Acct=v;
+  document.querySelectorAll('#t0-acc .chip').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
+  renderT0();
+}
+function t0Mo(v){multiTog(v,t0Ms,'#t0-mo',renderT0);}
+
+function renderT0(){
+  const body=document.getElementById('t0-body');
+  body.innerHTML='';
+  const acc=t0Acct;
+  const recs=ALL_DATA.filter(d=>{
+    if(d.acc!==acc)return false;
+    if(!t0Ms.has('ALL')){const dm=d.months.split(',');if(!dm.some(m=>t0Ms.has(m)))return false;}
+    return true;
+  });
+  if(!recs.length){body.innerHTML='<div class="empty-msg">No data for '+acc+'</div>';return;}
+
+  // ── KPIs ──
+  const totalImp=recs.reduce((s,r)=>s+r.imp,0);
+  const totalCost=recs.reduce((s,r)=>s+r.cost,0);
+  const totalRev=recs.reduce((s,r)=>s+r.rev,0);
+  const totalN=recs.length;
+  const overallROI=totalCost>0?+(totalRev/totalCost).toFixed(2):0;
+  const overallCPM=totalImp>0?+(totalCost/totalImp*1000).toFixed(3):0;
+
+  const kpiDiv=document.createElement('div');
+  kpiDiv.style.cssText='display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:18px';
+  [['Total Impressions',fmtI(totalImp)],['Total GMV',fmtK(totalRev)],['Overall ROI',overallROI],['Overall CPM','$'+overallCPM],['Creatives',totalN.toLocaleString()]].forEach(([l,v])=>{
+    const k=document.createElement('div');
+    k.style.cssText='background:#1e1e1e;border-radius:8px;padding:11px 13px;border:0.5px solid #2a2a2a';
+    k.innerHTML='<div style="font-size:10px;color:#555;margin-bottom:3px">'+l+'</div><div style="font-size:18px;font-weight:600;color:#fff">'+v+'</div>';
+    kpiDiv.appendChild(k);
+  });
+  body.appendChild(kpiDiv);
+
+  // ── Metric selector ──
+  const metricRow=document.createElement('div');
+  metricRow.id='t0-metric-row';
+  metricRow.style.cssText='display:flex;gap:6px;align-items:center;margin-bottom:14px;flex-wrap:wrap';
+  const metLbl=document.createElement('span');metLbl.style.cssText='font-size:10px;color:#555';metLbl.textContent='Sort by:';
+  metricRow.appendChild(metLbl);
+  [['imp','Impressions'],['roi','ROI'],['rev','GMV'],['ctr','CTR%'],['cpm','CPM']].forEach(([k,l],i)=>{
+    const btn=document.createElement('button');btn.className='ms-btn'+(i===0?' active':'');
+    btn.dataset.m=k;btn.textContent=l;
+    btn.onclick=function(){
+      document.querySelectorAll('#t0-metric-row .ms-btn').forEach(b=>b.classList.toggle('active',b===this));
+      renderT0Sections(this.dataset.m);
+    };
+    metricRow.appendChild(btn);
+  });
+  body.appendChild(metricRow);
+
+  const sectionsDiv=document.createElement('div');sectionsDiv.id='t0-sections';body.appendChild(sectionsDiv);
+  const drillDiv=document.createElement('div');drillDiv.id='t0-drill';body.appendChild(drillDiv);
+
+  // ── Aggregation helpers ──
+  function agg(arr,keyFn){
+    const map={};
+    arr.forEach(d=>{
+      const k=keyFn(d);if(!k)return;
+      if(!map[k])map[k]={key:k,imp:0,cost:0,rev:0,n:0,_cl:0,_lv:0,_ts:0,_eg:d.eg,_ct:d.ct,_prod:d.prod};
+      const a=map[k];
+      a.imp+=d.imp;a.cost+=d.cost;a.rev+=d.rev;a.n++;
+      a._cl+=d.imp*(d.ctr||0)/100;a._lv+=d.imp*(d.entry||0)/100;a._ts+=d.imp*(d.entry||0)/100*(d.ret10||0)/100;
+    });
+    return Object.values(map).map(a=>({
+      key:a.key,imp:a.imp,cost:a.cost,rev:a.rev,n:a.n,eg:a._eg,ct:a._ct,prod:a._prod,
+      roi:a.cost>0?+(a.rev/a.cost).toFixed(2):0,
+      cpm:a.imp>0?+(a.cost/a.imp*1000).toFixed(3):0,
+      ctr:a.imp>0?+(a._cl/a.imp*100).toFixed(3):0,
+      entry:a.imp>0?+(a._lv/a.imp*100).toFixed(2):0,
+      ret10:a._lv>0?+(a._ts/a._lv*100).toFixed(2):0,
+    }));
+  }
+  function sort(arr,m){const low=m==='cpm'||m==='cost';return[...arr].sort((a,b)=>low?a[m]-b[m]:b[m]-a[m]);}
+
+  // ── Bar builder ──
+  function makeBar(d,val,maxVal,color,onClick){
+    const pct=maxVal>0?(val/maxVal*100):0;
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:7px;cursor:pointer';
+    row.title='Click to see top 30 creatives';
+    const lbl=document.createElement('div');
+    lbl.style.cssText='font-size:11px;color:#ccc;width:160px;flex-shrink:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+    lbl.title=d.key;lbl.textContent=d.key;
+    const track=document.createElement('div');
+    track.style.cssText='flex:1;background:#252525;border-radius:3px;height:22px;overflow:hidden';
+    const fill=document.createElement('div');
+    fill.style.cssText='height:100%;width:'+pct.toFixed(1)+'%;background:'+color+';border-radius:3px;display:flex;align-items:center;padding:0 8px';
+    fill.innerHTML='<span style="font-size:9px;color:rgba(255,255,255,0.9);white-space:nowrap">'+(pct>12?fmtI(d.imp)+' impr':'')+'</span>';
+    track.appendChild(fill);
+    const meta=document.createElement('div');
+    meta.style.cssText='font-size:10px;color:#666;white-space:nowrap;min-width:200px';
+    meta.textContent=fmtI(d.imp)+' · ROI '+d.roi+' · CTR '+d.ctr+'% · CPM $'+d.cpm;
+    row.appendChild(lbl);row.appendChild(track);row.appendChild(meta);
+    row.onclick=onClick;
+    return row;
+  }
+
+  function makeSection(title,items,metric,colorFn,filterFn){
+    const sec=document.createElement('div');sec.style.marginBottom='20px';
+    const t=document.createElement('div');t.className='sec-title';t.textContent=title;sec.appendChild(t);
+    const maxVal=items.length?Math.max(...items.map(d=>Math.abs(d[metric]||0))):1;
+    items.forEach(d=>{
+      const val=Math.abs(d[metric]||0);
+      sec.appendChild(makeBar(d,val,maxVal,colorFn(d),()=>showT0Drill(d.key,filterFn(d))));
+    });
+    return sec;
+  }
+
+  // ── Drill panel ──
+  function showT0Drill(label,drillRecs){
+    const el=document.getElementById('t0-drill');el.innerHTML='';
+    const sorted=drillRecs.sort((a,b)=>b.imp-a.imp).slice(0,30);
+    const panel=document.createElement('div');panel.className='drill-panel';
+    // Title
+    const titleRow=document.createElement('div');titleRow.className='drill-title';
+    const titleSpan=document.createElement('span');titleSpan.textContent=label+' — Top 30 Creatives';
+    const closeBtn=document.createElement('span');closeBtn.className='drill-close';closeBtn.textContent='✕ Close';
+    closeBtn.onclick=()=>{el.innerHTML='';};
+    titleRow.appendChild(titleSpan);titleRow.appendChild(closeBtn);panel.appendChild(titleRow);
+    // Table
+    const wrap=document.createElement('div');wrap.style.overflowX='auto';
+    const tbl=document.createElement('table');tbl.className='mini-table';
+    tbl.innerHTML='<thead><tr><th style="text-align:left;min-width:220px">Creative Title</th><th>Type</th><th>Impr.</th><th>GMV</th><th>ROI</th><th>CTR%</th><th>CPM</th><th>Product</th></tr></thead>';
+    const tbody=document.createElement('tbody');
+    if(!sorted.length)tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#444;padding:16px">No creatives found</td></tr>';
+    sorted.forEach(d=>{
+      const col=EG_COLOR[d.eg]||'#aaa';
+      const tr=document.createElement('tr');
+      // Title cell (DOM - no escaping issues)
+      const tdTitle=document.createElement('td');
+      const titleDiv=document.createElement('div');titleDiv.className='mini-title';titleDiv.title=d.title||'';titleDiv.textContent=d.title||'(no title)';
+      const pidDiv=document.createElement('div');pidDiv.className='mini-pid';pidDiv.textContent=d.id+' ';
+      const cpBtn=document.createElement('button');cpBtn.className='cpbtn';cpBtn.textContent='copy';
+      cpBtn.onclick=(function(id){return function(){cpId(this,id);};})(d.id);
+      pidDiv.appendChild(cpBtn);tdTitle.appendChild(titleDiv);tdTitle.appendChild(pidDiv);tr.appendChild(tdTitle);
+      // Other cells
+      const prod=d.prod||(d.eg==='AI'?'🤖 AI':d.eg==='Official'?'📢 Official':'⚠️ Not recorded');
+      tr.innerHTML+='<td><span class="cbadge" style="background:'+col+'22;color:'+col+'">'+(EG_LBL[d.eg]||d.eg)+'</span></td>'+
+        '<td style="text-align:right;color:#1D9E75;font-weight:600">'+fmtI(d.imp)+'</td>'+
+        '<td style="text-align:right">'+fmtK(d.rev)+'</td>'+
+        '<td class="'+roiC(d.roi)+'" style="text-align:right">'+(d.roi||'-')+'</td>'+
+        '<td style="text-align:right">'+(d.ctr||'-')+'%</td>'+
+        '<td style="text-align:right">$'+(d.cpm||'-')+'</td>'+
+        '<td style="font-size:10px;color:#888">'+prod+'</td>';
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);wrap.appendChild(tbl);panel.appendChild(wrap);
+    el.appendChild(panel);el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  // ── Main render ──
+  function renderT0Sections(metric){
+    const sd=document.getElementById('t0-sections');sd.innerHTML='';
+    const ctColors=['#7B3FC0','#378ADD','#1D9E75','#D85A30','#F0A500','#E0607E','#888','#3ABFBF','#BA7517','#C0522F'];
+    const prodRecs=recs.filter(d=>d.prod);
+
+    // 1. Emoji
+    const byEg=sort(agg(recs,d=>d.eg),metric);
+    sd.appendChild(makeSection('Best Emoji Type',byEg,metric,d=>EG_COLOR[d.key]||'#378ADD',d=>recs.filter(r=>r.eg===d.key)));
+
+    // 2. Creative Type
+    const byCt=sort(agg(recs,d=>d.ct),metric).slice(0,8);
+    sd.appendChild(makeSection('Best Creative Type',byCt,metric,(d,i)=>{const idx=byCt.findIndex(x=>x.key===d.key);return ctColors[idx%ctColors.length];},d=>recs.filter(r=>r.ct===d.key)));
+
+    // 3. Products Top10
+    if(prodRecs.length){
+      const byProd=sort(agg(prodRecs,d=>d.prod),metric).slice(0,10);
+      sd.appendChild(makeSection('Top Products',byProd,metric,()=>'#378ADD',d=>prodRecs.filter(r=>r.prod===d.key)));
+    }
+
+    // 4. Emoji × CT
+    const egCtData=sort(agg(recs,d=>d.eg+'|||'+d.ct).map(a=>{
+      const[eg,ct]=a.key.split('|||');
+      return{...a,key:(eg==='AI'?'🤖':eg==='Official'?'📢':eg)+' + '+ct.split('(')[0].trim(),eg,ct};
+    }),metric).slice(0,8);
+    sd.appendChild(makeSection('Best Combo: Emoji × Creative Type',egCtData,metric,d=>EG_COLOR[d.eg]||'#888',d=>recs.filter(r=>r.eg===d.eg&&r.ct===d.ct)));
+
+    // 5. Emoji × Product
+    if(prodRecs.length){
+      const egProdData=sort(agg(prodRecs,d=>d.eg+'|||'+d.prod).map(a=>{
+        const[eg,prod]=a.key.split('|||');
+        return{...a,key:(eg==='AI'?'🤖':eg==='Official'?'📢':eg)+' + '+prod,eg,prod};
+      }),metric).slice(0,8);
+      sd.appendChild(makeSection('Best Combo: Emoji × Product',egProdData,metric,d=>(EG_COLOR[d.eg]||'#888')+'cc',d=>prodRecs.filter(r=>r.eg===d.eg&&r.prod===d.prod)));
+    }
+
+    // 6. Emoji × CT × Product
+    if(prodRecs.length){
+      const triData=sort(agg(prodRecs,d=>d.eg+'|||'+d.ct+'|||'+d.prod).map(a=>{
+        const[eg,ct,prod]=a.key.split('|||');
+        return{...a,key:(eg==='AI'?'🤖':eg==='Official'?'📢':eg)+' + '+ct.split('(')[0].trim()+' + '+prod,eg,ct,prod};
+      }),metric).slice(0,8);
+      sd.appendChild(makeSection('Best Combo: Emoji × Creative Type × Product',triData,metric,d=>(EG_COLOR[d.eg]||'#888')+'99',d=>prodRecs.filter(r=>r.eg===d.eg&&r.ct===d.ct&&r.prod===d.prod)));
+    }
+  }
+
+  renderT0Sections('imp');
+}
+
+
 // ── Tab switch ──
 function switchTab(id){
-  document.querySelectorAll('.mt').forEach((t,i)=>t.classList.toggle('active',['t1','t2','t3','t4'][i]===id));
-  ['t1','t2','t3','t4'].forEach(t=>document.getElementById(t).classList.toggle('active',t===id));
+  document.querySelectorAll('.mt').forEach((t,i)=>t.classList.toggle('active',['t0','t1','t2','t3','t4'][i]===id));
+  ['t0','t1','t2','t3','t4'].forEach(t=>document.getElementById(t).classList.toggle('active',t===id));
   document.getElementById('t1f').style.display=id==='t1'?'flex':'none';
+  if(id==='t0')renderT0();
   if(id==='t2'&&!expF.length)expApply();
   if(id==='t3')renderT3();
   if(id==='t4')renderT4List();
