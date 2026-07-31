@@ -976,7 +976,7 @@ function lgmAggRows(rows,grpKey){
     const a=map[k];
     a.lgm_cost+=r.lgm_cost||0;a.lgm_rev+=r.lgm_rev||0;a.lgm_lv+=r.lgm_lv||0;
     a.v2l_cost+=r.v2l_cost||0;a.v2l_rev+=r.v2l_rev||0;a.v2l_lv+=r.v2l_lv||0;
-    a.v2l_imp+=r.v2l_imp||0;a.v2l_n+=r.v2l_n||0;
+    a.v2l_imp+=r.v2l_imp||0;a.v2l_vv=(a.v2l_vv||0)+(r.v2l_vv||0);a.v2l_n+=r.v2l_n||0;
     a._cl+=r.v2l_imp*(r.v2l_ctr||0)/100;
     a._el+=r.v2l_imp*(r.v2l_entry||0)/100;
     a._ts+=r.v2l_imp*(r.v2l_entry||0)/100*(r.v2l_ret10||0)/100;
@@ -987,6 +987,7 @@ function lgmAggRows(rows,grpKey){
       lgm_cost:a.lgm_cost,lgm_rev:a.lgm_rev,lgm_lv:a.lgm_lv,
       lgm_roi:a.lgm_cost>0?+(a.lgm_rev/a.lgm_cost).toFixed(2):0,
       v2l_cost:a.v2l_cost,v2l_rev:a.v2l_rev,v2l_lv:a.v2l_lv,v2l_n:a.v2l_n,
+      v2l_imp:a.v2l_imp,v2l_vv:a.v2l_vv||0,
       v2l_roi:a.v2l_cost>0?+(a.v2l_rev/a.v2l_cost).toFixed(2):0,
       v2l_ctr:a.v2l_imp>0?+(a._cl/a.v2l_imp*100).toFixed(3):0,
       v2l_entry:a.v2l_imp>0?+(a._el/a.v2l_imp*100).toFixed(2):0,
@@ -1007,7 +1008,7 @@ function lgmAggByPeriod(rows,grpKey){
     const a=map[k];
     a.lgm_cost+=r.lgm_cost||0;a.lgm_rev+=r.lgm_rev||0;a.lgm_lv+=r.lgm_lv||0;
     a.v2l_cost+=r.v2l_cost||0;a.v2l_rev+=r.v2l_rev||0;a.v2l_lv+=r.v2l_lv||0;
-    a.v2l_imp+=r.v2l_imp||0;a.v2l_n+=r.v2l_n||0;
+    a.v2l_imp+=r.v2l_imp||0;a.v2l_vv=(a.v2l_vv||0)+(r.v2l_vv||0);a.v2l_n+=r.v2l_n||0;
     a._cl+=r.v2l_imp*(r.v2l_ctr||0)/100;
     a._el+=r.v2l_imp*(r.v2l_entry||0)/100;
     a._ts+=r.v2l_imp*(r.v2l_entry||0)/100*(r.v2l_ret10||0)/100;
@@ -1018,6 +1019,7 @@ function lgmAggByPeriod(rows,grpKey){
       lgm_cost:a.lgm_cost,lgm_rev:a.lgm_rev,lgm_lv:a.lgm_lv,
       lgm_roi:a.lgm_cost>0?+(a.lgm_rev/a.lgm_cost).toFixed(2):0,
       v2l_cost:a.v2l_cost,v2l_rev:a.v2l_rev,v2l_lv:a.v2l_lv,v2l_n:a.v2l_n,
+      v2l_imp:a.v2l_imp,v2l_vv:a.v2l_vv||0,
       v2l_roi:a.v2l_cost>0?+(a.v2l_rev/a.v2l_cost).toFixed(2):0,
       v2l_ctr:a.v2l_imp>0?+(a._cl/a.v2l_imp*100).toFixed(3):0,
       v2l_entry:a.v2l_imp>0?+(a._el/a.v2l_imp*100).toFixed(2):0,
