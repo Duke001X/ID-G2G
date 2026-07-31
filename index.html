@@ -1114,6 +1114,7 @@ function renderT0(){
   const fmtV=(v,m)=>{
     if(v===null||v===undefined)return'—';
     if(m==='lgm_cost'||m==='lgm_rev'||m==='v2l_cost'||m==='hua_cost')return fmtK(v);
+    if(m==='v2l_imp'||m==='v2l_vv'||m==='lgm_lv'||m==='v2l_lv')return fmtI(v);
     if(m.includes('pct')||m.includes('ctr')||m.includes('entry')||m.includes('ret'))return v+'%';
     return String(v);
   };
