@@ -1073,28 +1073,58 @@ function renderT0(){
   });
 
   // Chart
-  const byPeriod=lgmAggByPeriod(rows,grp);
-  const labels=byPeriod.map(r=>r.gk);
-  const dataA=byPeriod.map(r=>r[metA]||0);
-  const dataB=hasB?byPeriod.map(r=>r[metB]||0):[];
   const canvas=document.getElementById('lgm-chart');
   if(!canvas)return;
   if(lgmChart){lgmChart.destroy();lgmChart=null;}
-  const datasets=[{label:lA,data:dataA,borderColor:COL_A,backgroundColor:COL_A+'22',
-    borderWidth:2,pointRadius:grp==='month'?5:2,pointHoverRadius:6,tension:0.3,yAxisID:'yA'}];
-  if(hasB)datasets.push({label:lB,data:dataB,borderColor:COL_B,backgroundColor:COL_B+'22',
-    borderWidth:2,pointRadius:grp==='month'?5:2,pointHoverRadius:6,tension:0.3,yAxisID:'yB'});
+
+  const ACC_COLORS={TT1:'#378ADD',TT2:'#E0607E',TT4:'#1D9E75',TT5:'#F0A500',
+    TT6:'#7B3FC0',TT7:'#3ABFBF',TT8:'#D85A30'};
+  const ACCS_ORDER=['TT1','TT2','TT4','TT5','TT6','TT7','TT8'];
+
+  // Multi-acc mode: show one line per account when All selected + no Metric B
+  const isMultiAcc = lgmMode==='acc' && (lgmAccSet.has('ALL')||lgmAccSet.size>1) && !hasB;
+
+  let labels, datasets;
+  if(isMultiAcc){
+    // One line per account
+    const allAggRows=lgmAggRows(rows,grp);
+    const periods=[...new Set(allAggRows.map(r=>r.gk))].sort();
+    labels=periods;
+    const dims=lgmAccSet.has('ALL')?ACCS_ORDER:[...lgmAccSet].filter(a=>ACCS_ORDER.includes(a)).sort();
+    const cell={};allAggRows.forEach(r=>{if(!cell[r.gk])cell[r.gk]={};cell[r.gk][r.dk]=r;});
+    datasets=dims.map(acc=>({
+      label:acc,
+      data:periods.map(p=>cell[p]&&cell[p][acc]?cell[p][acc][metA]||0:null),
+      borderColor:ACC_COLORS[acc]||'#aaa',
+      backgroundColor:(ACC_COLORS[acc]||'#aaa')+'22',
+      borderWidth:2,pointRadius:grp==='month'?5:2,pointHoverRadius:6,
+      tension:0.3,yAxisID:'yA',spanGaps:false,
+    }));
+  } else {
+    // Single aggregated line (or dual metric)
+    const byPeriod=lgmAggByPeriod(rows,grp);
+    labels=byPeriod.map(r=>r.gk);
+    const dataA=byPeriod.map(r=>r[metA]||0);
+    const dataB=hasB?byPeriod.map(r=>r[metB]||0):[];
+    datasets=[{label:lA,data:dataA,borderColor:COL_A,backgroundColor:COL_A+'22',
+      borderWidth:2,pointRadius:grp==='month'?5:2,pointHoverRadius:6,tension:0.3,yAxisID:'yA'}];
+    if(hasB)datasets.push({label:lB,data:dataB,borderColor:COL_B,backgroundColor:COL_B+'22',
+      borderWidth:2,pointRadius:grp==='month'?5:2,pointHoverRadius:6,tension:0.3,yAxisID:'yB'});
+  }
+
   const scales={
     x:{ticks:{color:'#555',font:{size:10},maxRotation:45},grid:{color:'#1a1a1a'}},
-    yA:{position:'left',ticks:{color:COL_A,font:{size:10}},grid:{color:'#1a1a1a'},
-      title:{display:true,text:lA,color:COL_A,font:{size:10}}},
+    yA:{position:'left',ticks:{color:isMultiAcc?'#888':COL_A,font:{size:10}},grid:{color:'#1a1a1a'},
+      title:{display:true,text:isMultiAcc?lA+' by Account':lA,color:'#888',font:{size:10}}},
   };
   if(hasB)scales.yB={position:'right',ticks:{color:COL_B,font:{size:10}},
     grid:{drawOnChartArea:false},title:{display:true,text:lB,color:COL_B,font:{size:10}}};
+
   lgmChart=new Chart(canvas,{type:'line',data:{labels,datasets},
     options:{responsive:true,maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
-      plugins:{legend:{labels:{color:'#888',font:{size:11}}},
+      plugins:{
+        legend:{labels:{color:'#888',font:{size:11},boxWidth:12}},
         tooltip:{backgroundColor:'#1e1e1e',titleColor:'#ccc',bodyColor:'#aaa',borderColor:'#333',borderWidth:1}},
       scales}});
 
