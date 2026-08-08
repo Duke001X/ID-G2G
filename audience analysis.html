@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G2G 类目人群画像 · ID / MY</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#F6F7F9; --card:#FFFFFF; --ink:#1F2430; --sub:#6B7280; --line:#E7E9EE;
+    --brand:#C9776A; --brand-soft:#F1DAD5;
+    --stage1:#8FA8D6; --stage2:#7FB3A8; --stage3:#D9A24B; --stage4:#C9776A;
+    --id:#6C8FD1; --my:#D98E5C;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 60px;}
+
+  header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:18px;}
+  .eyebrow{font-size:12px;letter-spacing:.08em;color:var(--brand);font-weight:700;text-transform:uppercase;margin-bottom:6px;}
+  h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.01em;}
+  .meta{font-size:13px;color:var(--sub);margin-top:6px;}
+
+  .cat-select{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .cat-btn{border:1px solid var(--line);background:#fff;padding:9px 16px;border-radius:10px;font-size:13.5px;font-weight:600;color:var(--sub);cursor:pointer;transition:.15s;}
+  .cat-btn.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+  .tabs{display:flex;gap:6px;background:#EDEFF3;border-radius:12px;padding:4px;margin-bottom:22px;width:fit-content;}
+  .tab-btn{border:none;background:transparent;padding:9px 18px;border-radius:9px;font-size:14px;font-weight:600;color:var(--sub);cursor:pointer;transition:.15s;}
+  .tab-btn.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(20,20,43,.08);}
+
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:18px;}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--sub);}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;}
+
+  .section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 22px 12px;margin-bottom:20px;box-shadow:0 1px 2px rgba(20,20,43,.03);}
+  .section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .section-head h2{font-size:16px;margin:0;font-weight:700;}
+  .section-head .hint{font-size:12px;color:var(--sub);}
+  .chart-box{position:relative;height:300px;}
+
+  .insight{background:var(--brand-soft);border-radius:10px;padding:10px 14px;font-size:12.5px;color:#7A4237;margin:14px 0 16px;line-height:1.6;}
+  .insight.mono{background:#EAF0FB;color:#3B4F78;}
+  .insight.warn{background:#FCEFD8;color:#7A5A18;}
+
+  .market-page{display:none;}
+  .market-page.active{display:block;}
+  .note{font-size:12px;color:var(--sub);margin:-6px 0 18px;}
+
+  .summary{background:#1F2430;border-radius:16px;padding:24px 26px;margin:26px 0 20px;color:#E7E9EE;}
+  .summary h2{font-size:16px;margin:0 0 16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;}
+  .summary h2::before{content:"";width:4px;height:16px;background:var(--brand);border-radius:2px;display:inline-block;}
+  .summary-cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  .summary-block h3{font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;margin:0 0 10px;font-weight:700;}
+  .summary-block.problem h3{color:#E39B8F;}
+  .summary-block.todo h3{color:#8FC7B8;}
+  .summary-block ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:9px;}
+  .summary-block li{font-size:13px;line-height:1.6;color:#D7DAE1;}
+  .summary-block li b{color:#fff;font-weight:600;}
+  @media (max-width:760px){ .summary-cols{grid-template-columns:1fr;} }
+
+  footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="eyebrow">G2G · Audience Persona</div>
+      <h1 id="pageTitle">类目人群画像</h1>
+      <div class="meta" id="pageMeta">品类人群 → 曝光 → 点击 → 转化，近60天</div>
+    </div>
+  </header>
+
+  <div class="cat-select" id="catSelect"></div>
+
+  <div class="tabs" id="marketTabs">
+    <button class="tab-btn active" data-target="page-id">印尼 ID</button>
+    <button class="tab-btn" data-target="page-my">马来 MY</button>
+    <button class="tab-btn" data-target="page-cmp">ID vs MY 对比</button>
+  </div>
+
+  <!-- ============ ID ============ -->
+  <div class="market-page active" id="page-id">
+    <div class="legend" id="legend-id"></div>
+
+    <div class="section">
+      <div class="section-head"><h2>策略人群</h2><span class="hint">4阶段分组对比</span></div>
+      <div class="chart-box"><canvas id="id_seg"></canvas></div>
+      <div class="insight" id="id_seg_insight"></div>
+    </div>
+    <div class="section">
+      <div class="section-head"><h2>年龄分布</h2></div>
+      <div class="chart-box"><canvas id="id_age"></canvas></div>
+      <div class="insight" id="id_age_insight"></div>
+    </div>
+    <div class="section">
+      <div class="section-head"><h2>性别分布</h2></div>
+      <div class="chart-box"><canvas id="id_gender"></canvas></div>
+      <div class="insight" id="id_gender_insight"></div>
+    </div>
+    <div class="section">
+      <div class="section-head"><h2>地域分布 Top</h2></div>
+      <div class="chart-box"><canvas id="id_loc"></canvas></div>
+      <div class="insight" id="id_loc_insight"></div>
+    </div>
+
+    <div class="summary">
+      <h2>ID 小结</h2>
+      <div class="summary-cols">
+        <div class="summary-block problem"><h3>问题</h3><ul id="id_problems"></ul></div>
+        <div class="summary-block todo"><h3>TODO</h3><ul id="id_todos"></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MY ============ -->
+  <div class="market-page" id="page-my">
+    <div class="legend" id="legend-my"></div>
+
+    <div class="section">
+      <div class="section-head"><h2>策略人群</h2><span class="hint">4阶段分组对比</span></div>
+      <div class="chart-box"><canvas id="my_seg"></canvas></div>
+      <div class="insight" id="my_seg_insight"></div>
+    </div>
+    <div class="section">
+      <div class="section-head"><h2>年龄分布</h2></div>
+      <div class="chart-box"><canvas id="my_age"></canvas></div>
+      <div class="insight" id="my_age_insight"></div>
+    </div>
+    <div class="section">
+      <div class="section-head"><h2>性别分布</h2></div>
+      <div class="chart-box"><canvas id="my_gender"></canvas></div>
+      <div class="insight" id="my_gender_insight"></div>
+    </div>
+    <div class="section">
+      <div class="section-head"><h2>地域分布 Top</h2></div>
+      <div class="chart-box"><canvas id="my_loc"></canvas></div>
+      <div class="insight" id="my_loc_insight"></div>
+    </div>
+
+    <div class="summary">
+      <h2>MY 小结</h2>
+      <div class="summary-cols">
+        <div class="summary-block problem"><h3>问题</h3><ul id="my_problems"></ul></div>
+        <div class="summary-block todo"><h3>TODO</h3><ul id="my_todos"></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ID vs MY ============ -->
+  <div class="market-page" id="page-cmp">
+    <div class="legend">
+      <span class="legend-item"><span class="dot" style="background:var(--id)"></span>ID</span>
+      <span class="legend-item"><span class="dot" style="background:var(--my)"></span>MY</span>
+    </div>
+    <div class="note">以下均取「转化人群」口径对比两国人群结构差异；地域维度因两国省份体系不同，暂不做交叉对比。</div>
+
+    <div class="section">
+      <div class="section-head"><h2>策略人群 · 转化人群结构对比</h2></div>
+      <div class="chart-box"><canvas id="cmp_seg"></canvas></div>
+      <div class="insight mono" id="cmp_seg_insight"></div>
+    </div>
+    <div class="section">
+      <div class="section-head"><h2>年龄 · 转化人群结构对比</h2></div>
+      <div class="chart-box"><canvas id="cmp_age"></canvas></div>
+      <div class="insight mono" id="cmp_age_insight"></div>
+    </div>
+    <div class="section">
+      <div class="section-head"><h2>性别 · 转化人群结构对比</h2></div>
+      <div class="chart-box"><canvas id="cmp_gender"></canvas></div>
+      <div class="insight mono" id="cmp_gender_insight"></div>
+    </div>
+  </div>
+
+  <footer>数据来源：TikTok Ads Manager 人群画像后台截图人工读数还原　｜　PH / TH 数据补充后可接入同一模板</footer>
+</div>
+
+<script>
+const PERSONA_DATA = {
+  segCanonical: ['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+  ageLabels: ['18-24','25-34','35-44','45-54','55+'],
+  genderLabels: ['男','女'],
+
+  skincare: {
+    title: 'Skincare', criteria: '面霜 + 精华',
+    ID: {
+      total: '21,994,779',
+      seg: { labels: ['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        p:[23.19,15.65,14.50,14.21,12.77,9.36,6.26,4.06],
+        e:[23.22,8.98,19.24,12.84,18.18,5.86,8.67,3.00],
+        c:[23.46,9.11,19.02,14.70,17.97,5.92,6.75,3.07],
+        v:[24.88,11.49,17.67,14.15,15.71,6.93,6.54,2.63],
+        insight: '「年轻低消费」「Gen Z 低/高消费」三类合计占比从品类人群~50%走高到转化端~58%，是当前贡献转化的主力；「银发一族」全链路持续走低（4.1%→2.6%）。' },
+      age: { labels:['18-24','25-34','35-44','45-54','55+'],
+        p:[27.27,43.66,17.79,7.22,4.06], e:[37.42,44.73,11.46,3.39,3.00], c:[37.00,44.91,11.72,3.30,3.07], v:[33.39,45.57,14.65,3.77,2.63],
+        insight: '25-34岁在链路中被持续放大（品类43.7%→转化45.6%）；18-24岁曝光被拉高到37%+后转化端回落到33.4%，中间存在一定浪费。' },
+      gender: { labels:['男','女'], p:[22.56,77.44], e:[32.01,67.99], c:[23.41,76.59], v:[22.20,77.80],
+        insight: '女性占比在曝光阶段被稀释到68%（品类大盘77.4%），点击/转化又回升至76-78%，说明曝光端对男性触达没能转化为有效行为。' },
+      loc: { labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],
+        p:[23.82,15.76,11.91,8.55,6.68,3.51], e:[23.94,16.84,14.73,8.29,6.58,3.26], c:[26.47,18.21,16.27,7.97,6.76,3.26], v:[30.53,16.94,16.67,9.11,7.74,2.36],
+        insight: '西爪哇省转化端占比（30.5%）明显高于品类大盘（23.8%），是转化效率最高的地区。' },
+      summary: {
+        problems: [
+          '<b>男性曝光被浪费。</b>曝光阶段男性占比被拉高到32%（品类大盘仅22.6%），点击/转化又回落到23%左右，说明存在无效花费。',
+          '<b>银发一族/年轻高消费效率持续走低。</b>两个人群从品类到转化占比一路下滑，素材和出价可能都没有针对性。',
+          '<b>18-24岁在曝光端被过度放大。</b>品类27.3%被拉到曝光37%+，转化又回落到33.4%，中间有浪费空间。'
+        ],
+        todos: [
+          '排查曝光端男性定向来源，针对性收窄定向或调整素材。',
+          '「精致妈妈」「Gen Z 高消费」点击→转化阶段保持稳定，可加大预算测试。',
+          '「银发一族」「年轻高消费」单独测试素材/出价，效率仍低则收缩预算占比。',
+          '西爪哇转化效率最高，可评估加大该地区定向权重或提高出价系数。'
+        ]
+      }
+    },
+    MY: {
+      total: '3,410,980',
+      seg: { labels: ['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        p:[16.98,21.40,8.97,14.60,12.53,13.97,5.55,6.01],
+        e:[18.03,15.14,14.05,14.04,19.45,9.11,6.80,3.38],
+        c:[17.42,15.68,12.50,16.51,19.23,9.76,5.62,3.28],
+        v:[17.43,20.52,11.03,15.00,15.99,11.54,5.09,3.40],
+        insight: '「中年低消费」是MY转化端占比最高的人群（20.5%），路径较稳定；「Gen Z 高消费」曝光/点击被明显放大（19%+），转化端回落到16%，曝光效率没有完全兑现。' },
+      age: { labels:['18-24','25-34','35-44','45-54','55+'],
+        p:[21.49,37.15,23.97,11.40,6.01], e:[33.50,38.67,17.63,6.61,3.38], c:[31.73,39.55,18.77,6.67,3.28], v:[27.02,37.52,23.09,8.97,3.40],
+        insight: '35-44岁品类占比达23.97%（ID同段仅17.79%），是MY与ID最大的结构差异，但曝光阶段被压缩到17.63%，覆盖不够充分。' },
+      gender: { labels:['男','女'], p:[21.78,78.22], e:[27.95,72.05], c:[21.72,78.28], v:[20.15,79.85],
+        insight: 'MY女性占比在各阶段都比ID更高更稳定（78-80%），曝光阶段被稀释幅度（72.1%）也小于ID（68.0%），性别精准度相对更好。' },
+      loc: { labels:['雪兰莪','吉隆坡','柔佛','沙巴','砂拉越','霹雳'],
+        p:[34.49,13.41,9.52,5.94,5.91,4.69], e:[32.09,13.54,9.04,6.71,6.42,4.89], c:[31.49,13.50,8.87,6.57,6.13,5.05], v:[34.03,13.74,9.83,5.22,5.22,4.83],
+        insight: '雪兰莪断层领先，全链路占比稳定在32-34%，不像ID西爪哇会随阶段明显放大。' },
+      summary: {
+        problems: [
+          '<b>Gen Z高消费曝光效率没能兑现。</b>曝光/点击占比19-20%（各阶段最高），转化回落到16%，存在一定浪费。',
+          '<b>35-44岁品类基数大但覆盖不足。</b>品类占23.97%，曝光被压到17.63%，投放对这个年龄层不够重视。',
+          '<b>年轻高消费/银发一族转化占比最低。</b>分别仅5.09%、3.40%，全链路偏低。'
+        ],
+        todos: [
+          '复核Gen Z高消费的素材/落地页，确认高曝光高点击但低转化的原因。',
+          '35-44岁人群单独测试定向，评估能否放量。',
+          '「中年低消费」全链路最稳定且转化最高，优先保证预算和素材供给。',
+          '雪兰莪渗透已较充分，增量可关注吉隆坡、柔佛等第二梯队地区。'
+        ]
+      }
+    },
+    cmp: {
+      seg: 'ID转化端更集中在「年轻/Gen Z 低消费」（合计42.6%），MY转化端更集中在「中年低消费+Gen Z 高消费」（合计36.5%），MY用户消费力分层整体更靠中高端。',
+      age: 'ID转化端25-34岁占比45.6%明显领先；MY虽同样以25-34岁为主（37.5%），但35-44岁占比高达23.1%（ID仅14.7%），MY核心用户年龄结构更宽、更偏成熟。',
+      gender: '两国转化端都是女性主导（77-80%），MY女性占比（79.9%）略高于ID（77.8%），差异不大。'
+    }
+  },
+
+  makeup: {
+    title: 'Makeup', criteria: '底妆 + 粉饼',
+    ID: {
+      total: '10,321,288',
+      seg: { labels: ['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        p:[21.40,13.13,15.51,16.40,16.25,8.43,5.22,3.66],
+        e:[23.73,10.25,19.94,14.68,16.97,5.94,4.98,3.52],
+        c:[23.02,8.91,21.64,14.91,18.68,5.22,3.99,3.63],
+        v:[22.49,9.41,19.32,15.92,19.26,6.09,4.53,2.98],
+        insight: '「年轻低消费」「Gen Z 低/高消费」合计占比转化端接近61%，是makeup最核心的三个人群；「精致妈妈」占比在转化端稳中有升（16.4%→15.9%）。' },
+      age: { labels:['18-24','25-34','35-44','45-54','55+'],
+        p:[31.75,43.02,15.38,6.58,3.66], e:[36.90,43.39,12.33,3.86,3.52], c:[40.32,41.92,10.79,3.35,3.65], v:[38.58,42.94,12.17,3.34,2.98],
+        insight: '18-24岁在makeup类目里是最被放大的年龄段（品类31.8%→点击40.3%），比skincare更年轻化。' },
+      gender: { labels:['男','女'], p:[16.10,83.90], e:[18.84,81.16], c:[15.03,84.97], v:[14.59,85.41],
+        insight: '女性主导程度比skincare更强（品类83.9% vs 77.4%），符合美妆品类的用户结构预期。' },
+      loc: { labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],
+        p:[25.81,14.32,11.60,8.98,7.19,3.40], e:[22.39,14.65,12.96,7.62,6.15,4.17], c:[25.41,14.91,14.04,7.67,6.67,3.77], v:[29.46,14.54,13.61,8.58,7.84,1.95],
+        insight: '西爪哇转化占比（29.5%）同样是各阶段最高，与skincare地域模式基本一致。' },
+      summary: {
+        problems: [
+          '<b>男性曝光同样偏高。</b>曝光阶段男性占比18.8%（品类16.1%），点击/转化又回落到15%左右，存在轻度浪费。',
+          '<b>18-24岁曝光/点击被过度放大后转化回落。</b>点击端占比40.3%，转化回落到38.6%，头部年龄段投放效率有优化空间。',
+          '<b>银发一族占比全链路最低。</b>转化端仅2.98%，是makeup类目效率最低的人群。'
+        ],
+        todos: [
+          '复核makeup曝光端男性定向来源，适当收窄。',
+          '「精致妈妈」「Gen Z高消费」转化端占比稳中有升，可作为makeup重点测试人群。',
+          '18-24岁可尝试细分素材（学生党/初入职场），提升转化承接效率。'
+        ]
+      }
+    },
+    MY: {
+      total: '2,435,959',
+      seg: { labels: ['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        p:[15.51,20.19,8.91,17.60,15.31,13.60,4.10,4.79],
+        e:[18.12,17.38,13.96,15.69,17.77,8.75,3.82,4.51],
+        c:[16.57,14.76,13.82,18.04,21.76,8.39,3.13,3.53],
+        v:[15.82,20.35,10.27,17.47,17.88,11.43,3.21,3.57],
+        insight: '「中年低消费」「精致妈妈」是MY makeup转化端占比最高的两类（合计37.8%），Gen Z高消费在点击阶段达到21.76%的峰值后转化回落到17.9%。' },
+      age: { labels:['18-24','25-34','35-44','45-54','55+'],
+        p:[24.21,37.22,23.06,10.73,4.79], e:[31.73,37.64,18.29,7.84,4.51], c:[35.58,37.74,16.65,6.50,3.53], v:[28.15,36.50,21.92,9.86,3.57],
+        insight: 'MY makeup的35-44岁转化占比21.9%，同样明显高于ID的12.2%，与skincare呈现相同的“MY用户更成熟”模式。' },
+      gender: { labels:['男','女'], p:[13.19,86.81], e:[15.68,84.32], c:[12.05,87.95], v:[11.58,88.42],
+        insight: 'MY makeup转化端女性占比高达88.4%，是所有类目中女性集中度最高的一个。' },
+      loc: { labels:['雪兰莪','吉隆坡','柔佛','沙巴','砂拉越','霹雳'],
+        p:[33.13,13.13,9.30,6.22,5.68,4.89], e:[32.75,13.39,8.61,7.26,6.67,4.79], c:[31.93,13.67,8.93,6.25,5.39,5.15], v:[33.67,13.89,10.08,5.54,5.57,5.22],
+        insight: '雪兰莪+吉隆坡合计占转化端近48%，地域集中度是6个类目里较高的。' },
+      summary: {
+        problems: [
+          '<b>Gen Z高消费点击端被过度放大。</b>点击占比21.76%（各阶段最高），转化回落到17.88%，中间转化效率不足。',
+          '<b>18-24岁曝光/点击占比走高但转化回落。</b>点击35.58%→转化28.15%，浪费比例在6个类目里偏高。',
+          '<b>年轻高消费转化占比最低。</b>仅3.21%，且全链路持续走低。'
+        ],
+        todos: [
+          '复核Gen Z高消费点击→转化的断点（落地页/客单价/素材卖点）。',
+          '「中年低消费」「精致妈妈」转化贡献最大，优先保证预算供给。',
+          '18-24岁投放建议收紧频次或优化素材，减少曝光→转化损耗。'
+        ]
+      }
+    },
+    cmp: {
+      seg: 'ID转化端集中在「Gen Z 低/高消费+年轻低消费」（合计61%），MY转化端更均衡分布在「中年低消费/精致妈妈/Gen Z高消费」三类（合计53.7%），MY用户结构比ID更分散、更偏中年。',
+      age: 'ID转化端18-24岁占比38.6%远高于MY的28.2%；MY 35-44岁占比21.9%是ID同段（12.2%）的近2倍，两国核心年龄结构差异明显。',
+      gender: '两国makeup转化端都是女性高度主导，MY（88.4%）比ID（85.4%）更集中。'
+    }
+  },
+
+  body: {
+    title: 'Body', criteria: '视黄醇身体乳 / 烟酰胺身体乳 / 美白素颜霜',
+    ID: {
+      total: '14,047,115',
+      seg: { labels: ['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        p:[22.81,13.31,15.83,14.97,14.80,8.29,6.22,3.78],
+        e:[22.24,9.67,19.34,15.07,18.96,5.92,6.79,3.03],
+        c:[20.89,7.03,19.91,16.71,20.98,5.52,5.82,3.24],
+        v:[27.99,8.36,21.84,11.08,19.37,7.84,3.52,0.0],
+        insight: 'Gen Z高/低消费合计占比从品类30.6%放大到点击40.9%，是body类目里被放大最明显的两个人群；转化端读数样本偏小，银发一族占比趋近于0，建议结合更长周期数据复核。' },
+      age: { labels:['18-24','25-34','35-44','45-54','55+'],
+        p:[30.63,44.00,15.63,5.97,3.78], e:[38.30,44.10,11.26,3.32,3.01], c:[40.88,43.42,9.65,2.81,3.24], v:[36.24,45.03,12.64,3.22,2.87],
+        insight: '25-34岁转化占比45.0%为各类目最高之一，18-24岁在点击阶段达到峰值40.9%后转化回落到36.2%。' },
+      gender: { labels:['男','女'], p:[21.81,78.19], e:[22.97,77.03], c:[17.78,82.22], v:[18.55,81.45],
+        insight: 'Body类目性别结构与skincare接近，曝光阶段男性占比略升后点击/转化明显回落，男性曝光效率偏低。' },
+      loc: { labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],
+        p:[20.08,16.24,12.09,7.47,5.97,4.09], e:[21.00,15.47,13.24,7.34,5.98,4.41], c:[23.76,15.74,14.47,7.40,6.51,4.18], v:[26.92,15.26,15.11,8.29,7.74,3.67],
+        insight: '西爪哇转化占比26.9%持续领先，东爪哇/中爪哇省占比在链路中保持稳定的第二梯队。' },
+      summary: {
+        problems: [
+          '<b>男性曝光效率偏低。</b>曝光占比23.0%，点击/转化回落到18%左右，浪费比例与skincare接近。',
+          '<b>Gen Z人群点击端被显著放大。</b>合计点击占比40.9%，为链路峰值，需要关注是否能有效承接为转化。',
+          '<b>转化端数据样本偏小。</b>银发一族读数趋近于0，建议结合更长时间窗口复核，避免单周期误判。'
+        ],
+        todos: [
+          '排查曝光端男性定向来源，收窄或调整素材。',
+          '关注Gen Z人群点击→转化的承接效果，视情况优化落地页/客单价匹配。',
+          '建议拉长统计周期重新核对转化端人群分布，避免样本量不足导致误判。'
+        ]
+      }
+    },
+    MY: {
+      total: '1,839,217',
+      seg: { labels: ['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        p:[18.22,22.49,8.65,14.06,12.64,11.29,5.28,7.38],
+        e:[19.09,18.47,13.24,13.10,16.54,9.24,5.89,4.43],
+        c:[17.26,15.40,12.59,16.65,20.85,8.70,5.00,3.58],
+        v:[17.96,21.41,10.47,14.75,15.43,11.20,4.64,4.14],
+        insight: '「中年低消费」转化占比21.4%为MY body最高人群，与skincare模式一致；Gen Z高消费点击端达20.85%峰值后转化回落到15.4%。' },
+      age: { labels:['18-24','25-34','35-44','45-54','55+'],
+        p:[21.27,37.56,22.77,11.07,7.58], e:[29.78,38.08,19.36,8.35,4.43], c:[33.43,38.89,17.31,6.78,3.58], v:[25.90,37.35,22.80,9.81,4.14],
+        insight: 'MY body类目55+占比（品类7.58%）明显高于ID同类目（3.78%），是6个类目中银发人群基数最大的一个。' },
+      gender: { labels:['男','女'], p:[24.05,75.95], e:[25.89,74.11], c:[19.18,80.82], v:[17.99,82.01],
+        insight: '品类大盘男性占比24.1%，是MY六类目中男性基数较高的一个，但点击/转化阶段迅速收窄到18%左右。' },
+      loc: { labels:['雪兰莪','吉隆坡','柔佛','沙巴','砂拉越','霹雳'],
+        p:[33.43,13.17,9.28,7.05,6.88,4.47], e:[31.69,12.89,8.76,8.65,8.61,4.37], c:[30.01,13.23,8.89,8.26,6.29,4.87], v:[32.20,13.54,8.85,7.88,7.51,5.07],
+        insight: '沙巴、砂拉越占比（品类7%左右）在body类目里比其他类目更高，说明东马地区对身体护理品类需求相对更强。' },
+      summary: {
+        problems: [
+          '<b>男性品类基数大但转化端快速收窄。</b>品类24.1%→转化18.0%，男性曝光/点击的承接效率不高。',
+          '<b>55+银发人群品类基数偏大但曝光不足。</b>品类7.58%，曝光被压缩到4.43%，覆盖不充分。',
+          '<b>Gen Z高消费点击端被明显放大。</b>20.85%点击占比后转化回落到15.4%，与ID body模式一致。'
+        ],
+        todos: [
+          '复核男性向素材的点击后承接路径（落地页/客单价）。',
+          '55+人群品类基数大，可小范围测试定向覆盖，评估转化潜力。',
+          '东马（沙巴/砂拉越）需求相对更强，可评估是否值得单独提高预算权重。'
+        ]
+      }
+    },
+    cmp: {
+      seg: 'ID转化端集中在「年轻低消费+Gen Z低消费」（合计49.8%），MY转化端「中年低消费」独占21.4%最高，用户消费分层结构两国差异明显。',
+      age: 'MY 55+占比（品类7.58%，转化4.14%）明显高于ID（品类3.78%，转化2.87%），MY银发人群基数更大，ID则更集中在18-34岁。',
+      gender: 'ID男性占比全链路更低更稳定（18-23%），MY男性品类基数更高（24.1%）但转化端收窄更快，两国男性用户的行为路径不同。'
+    }
+  },
+
+  mens_care: {
+    title: "Men's Care", criteria: '火山泥洁面',
+    ID: {
+      total: '2,694,374',
+      seg: { labels: ['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        p:[24.15,14.28,20.50,6.56,15.33,9.69,3.20,6.28],
+        e:[26.18,10.67,25.67,6.05,15.96,7.75,3.77,3.95],
+        c:[25.68,9.79,25.45,6.64,16.10,8.00,3.86,4.48],
+        v:[27.25,9.52,25.38,6.49,14.70,8.66,3.95,4.07],
+        insight: '「年轻低消费+Gen Z低消费」合计转化占比52.6%，是men’s care最核心的两类人群，精致妈妈占比全链路最低（转化仅6.5%），符合男性向产品的预期。' },
+      age: { labels:['18-24','25-34','35-44','45-54','55+'],
+        p:[35.83,44.72,12.39,3.87,3.20], e:[41.62,42.91,8.85,2.67,3.95], c:[41.55,42.17,8.94,2.92,4.48], v:[40.28,43.05,9.89,2.84,3.95],
+        insight: '18-24+25-34岁合计占比全链路都在80%以上，是6个类目中年轻人群集中度最高的。' },
+      gender: { labels:['男','女'], p:[63.24,36.76], e:[56.71,43.29], c:[52.56,47.44], v:[53.26,46.74],
+        insight: '品类大盘男性占比63.2%，是唯一男性主导的类目；但曝光/点击/转化阶段男性占比持续被稀释到53%左右，说明投放没有保持男性向的精准度。' },
+      loc: { labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],
+        p:[23.55,15.87,11.59,9.22,7.05,3.56], e:[26.69,18.57,16.42,8.54,7.35,2.62], c:[29.43,20.17,17.75,8.61,7.79,2.04], v:[36.55,19.29,18.48,10.40,9.64,1.91],
+        insight: '西爪哇转化占比高达36.6%，是6个类目里地域集中度最高的一个类目。' },
+      summary: {
+        problems: [
+          '<b>男性精准度被稀释。</b>品类大盘男性63.2%，转化端已回落到53.3%，说明投放没能保持该类目应有的男性向精准定位。',
+          '<b>西爪哇过度集中。</b>转化占比36.6%，明显高于品类大盘23.6%，存在地域集中风险，其他地区渗透不足。'
+        ],
+        todos: [
+          '复核men’s care素材/定向的性别精准度，尽量维持在品类大盘的63%左右。',
+          '评估东爪哇、中爪哇省等第二梯队地区的追加投放空间，降低对西爪哇的依赖。'
+        ]
+      }
+    },
+    MY: {
+      total: '334,510',
+      seg: { labels: ['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        p:[22.79,16.41,16.70,5.28,15.31,7.97,11.32,4.23],
+        e:[22.59,9.02,19.22,3.98,20.84,4.77,16.97,2.61],
+        c:[20.72,8.04,18.67,4.57,22.67,4.87,18.01,2.46],
+        v:[0,0,0,0,0,0,0,0],
+        insight: '<b>样本不足，转化端暂无有效数据。</b>该类目MY品类人群总量仅33.5万，是六类目里基数最小的，投放/统计周期内未积累出可用的转化人群分层。' },
+      age: { labels:['18-24','25-34','35-44','45-54','55+'],
+        p:[32.02,39.58,17.38,7.00,4.23], e:[40.06,43.55,10.91,2.88,2.61], c:[41.34,43.29,10.12,2.78,2.46], v:[49.19,50.81,0,0,0],
+        insight: '转化端仅18-24/25-34两个年龄段有数据（各约50%），35+人群样本量不足以进入统计。' },
+      gender: { labels:['男','女'], p:[62.81,37.19], e:[74.65,25.35], c:[74.03,25.97], v:[69.29,30.71],
+        insight: 'MY men’s care男性占比在曝光/点击阶段被进一步放大到74%左右，比ID更符合男性向产品定位，但转化端样本量小，数据参考价值有限。' },
+      loc: { labels:['雪兰莪','吉隆坡','柔佛','沙巴','砂拉越','霹雳'],
+        p:[33.62,13.21,10.19,5.21,5.19,5.16], e:[31.40,13.17,9.69,7.90,7.21,4.64], c:[31.50,13.37,9.35,8.93,8.01,4.56], v:[100,0,0,0,0,0],
+        insight: '转化端样本仅覆盖雪兰莪一个地区（100%），数据量太小，不具备地域分布参考意义。' },
+      summary: {
+        problems: [
+          '<b>转化端数据全面不足。</b>策略人群、年龄（35+缺失）、地域（仅雪兰莪）都因样本量过小无法形成有效分层，MY品类人群基数仅33.5万，是六类目最小。',
+          '<b>男性精准度虽好但基数太小难以放量。</b>曝光/点击男性占比74%左右，方向正确但整体量级过低，难以支撑精细化运营。'
+        ],
+        todos: [
+          '优先扩大MY men’s care的曝光/点击量级，积累足够样本后再做转化端人群分析。',
+          '短期内可参考ID men’s care的人群结构作为投放假设，待MY样本量提升后再校准。',
+          '评估该类目在MY市场是否值得持续投入，或收窄为长尾测试品类。'
+        ]
+      }
+    },
+    cmp: {
+      seg: 'ID转化端有完整8类人群分布（年轻低消费27.3%最高），MY因样本不足暂无转化端策略人群数据，暂不具备可比性。',
+      age: 'ID各年龄段均有数据，18-24+25-34合计占比83.3%；MY转化端仅18-24/25-34两段有数据（合计100%），35+样本缺失，暂不完全可比。',
+      gender: 'ID转化端男性占比53.3%，MY为69.3%（小样本）；MY投放的男性精准度方向更好，但仍需扩大样本验证。'
+    }
+  },
+
+  facial_cleansers: {
+    title: 'Facial Cleansers', criteria: '除火山泥洁面外的洁面',
+    ID: {
+      total: '9,581,392',
+      seg: { labels: ['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        p:[24.84,14.94,17.61,11.91,12.39,7.91,6.55,3.85],
+        e:[25.54,9.70,22.78,8.63,16.36,8.56,4.69,3.72],
+        c:[25.73,10.02,22.72,9.61,16.15,4.80,7.04,3.93],
+        v:[26.85,11.34,21.92,10.30,14.62,5.41,6.14,3.43],
+        insight: '「年轻低消费+Gen Z低消费」合计转化占比48.8%，是facial cleansers最主要的两类人群，结构与skincare、makeup接近。' },
+      age: { labels:['18-24','25-34','35-44','45-54','55+'],
+        p:[30.00,43.30,16.66,6.20,3.85], e:[39.14,42.75,10.93,3.46,3.72], c:[38.86,42.39,11.59,3.43,3.93], v:[36.54,43.29,13.22,3.52,3.43],
+        insight: '18-24岁品类占比30.0%被拉高到曝光39.1%后转化回落到36.5%，走势与skincare几乎一致。' },
+      gender: { labels:['男','女'], p:[28.85,71.15], e:[40.28,59.72], c:[34.35,65.65], v:[29.48,70.52],
+        insight: '洁面类目品类大盘男性占比28.9%，是女性向类目中男性基数较高的一个；曝光阶段男性被放大到40.3%，转化又回落到29.5%，浪费幅度是6类目中最大的。' },
+      loc: { labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],
+        p:[27.11,15.59,12.52,9.24,7.81,3.10], e:[23.81,17.34,14.91,7.63,6.70,3.25], c:[26.69,17.93,15.59,7.68,7.25,2.98], v:[35.32,16.21,15.19,9.29,9.20,2.52],
+        insight: '西爪哇转化占比35.3%持续领先，万丹省转化占比（9.2%）相对品类大盘（7.8%）也有提升。' },
+      summary: {
+        problems: [
+          '<b>男性曝光浪费在6类目中最明显。</b>品类28.9%被曝光拉高到40.3%，转化又回落到29.5%，中间浪费幅度最大。',
+          '<b>中年高消费转化占比偏低。</b>品类7.91%到转化仅5.41%，全链路走低。'
+        ],
+        todos: [
+          '优先复核facial cleansers曝光端男性定向来源，这是6类目里问题最突出的一个。',
+          '「年轻高消费」点击/转化阶段占比回升（4.69%→6.14%），可加大测试。',
+          '中年高消费素材/定向需要针对性优化，避免持续走低。'
+        ]
+      }
+    },
+    MY: {
+      total: '2,130,169',
+      seg: { labels: ['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        p:[17.36,23.63,9.46,13.09,11.64,13.38,5.29,6.15],
+        e:[20.36,15.11,19.67,8.02,18.38,6.42,7.92,4.12],
+        c:[19.04,17.24,17.22,9.10,18.64,7.41,6.99,4.36],
+        v:[19.10,22.06,14.46,9.11,16.12,8.35,6.89,3.92],
+        insight: '「中年低消费」转化占比22.1%为MY facial cleansers最高人群，品类大盘占比23.6%也是最高，路径最稳定。' },
+      age: { labels:['18-24','25-34','35-44','45-54','55+'],
+        p:[21.10,35.75,25.04,11.96,6.15], e:[38.05,36.30,15.40,6.13,4.12], c:[35.86,35.14,17.53,7.13,4.36], v:[30.58,34.32,21.77,9.40,3.92],
+        insight: '35-44岁品类占比25.0%是MY facial cleansers里第二大年龄段，转化端仍保持21.8%，比ID同段（13.2%）高出许多。' },
+      gender: { labels:['男','女'], p:[22.30,77.70], e:[43.42,56.58], c:[37.47,62.53], v:[33.72,66.28],
+        insight: 'MY facial cleansers男性曝光被放大到43.4%（品类22.3%），是MY六类目里男性曝光浪费最明显的一个，与ID的问题模式一致。' },
+      loc: { labels:['雪兰莪','吉隆坡','柔佛','沙巴','砂拉越','霹雳'],
+        p:[34.14,13.15,9.54,5.34,5.28,4.98], e:[31.47,13.13,8.86,7.64,7.34,4.81], c:[31.53,13.65,8.62,6.85,6.38,5.14], v:[35.65,14.17,9.60,5.61,5.61,5.33],
+        insight: '雪兰莪转化占比35.7%持续领先，与品类大盘（34.1%）差异不大，地域结构全链路较稳定。' },
+      summary: {
+        problems: [
+          '<b>男性曝光浪费明显。</b>品类22.3%被曝光拉高到43.4%，转化回落到33.7%，与ID facial cleansers问题模式一致，且MY幅度更大。',
+          '<b>35-44岁品类基数大，曝光覆盖不足。</b>品类25.0%，曝光被压缩到15.4%，与body/skincare类似问题重复出现。'
+        ],
+        todos: [
+          '两国facial cleansers男性曝光都偏高，建议统一排查是否用了相同的男性向素材/计划模板。',
+          '35-44岁人群品类基数大，建议单独测试该年龄段定向覆盖。'
+        ]
+      }
+    },
+    cmp: {
+      seg: 'ID转化端集中在「年轻/Gen Z低消费」（合计48.8%），MY转化端「中年低消费」独占22.1%最高，与body、skincare呈现相同的两国消费分层差异模式。',
+      age: 'MY 35-44岁转化占比21.8%远高于ID的13.2%，两国在这个类目上的年龄结构差异是6个类目里较大的之一。',
+      gender: '两国facial cleansers都出现曝光端男性被过度放大的问题（ID曝光40.3% / MY曝光43.4%），是两国共性问题，建议统一排查。'
+    }
+  },
+
+  face_masks: {
+    title: 'Face Masks', criteria: '祛痘啫喱面膜 / 玫瑰啫喱面膜',
+    ID: {
+      total: '5,747,496',
+      seg: { labels: ['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        p:[21.23,10.24,18.06,15.91,17.48,7.40,6.23,3.43],
+        e:[23.52,7.44,21.26,15.21,18.57,6.06,4.90,3.03],
+        c:[23.11,7.40,21.68,15.66,18.58,5.25,4.88,3.43],
+        v:[24.98,8.14,21.54,15.13,16.00,5.44,5.59,3.17],
+        insight: '「年轻低消费+Gen Z低消费」合计转化占比46.5%，「精致妈妈」占比全链路稳定在15%左右，是面膜类目里比较稳定的贡献人群。' },
+      age: { labels:['18-24','25-34','35-44','45-54','55+'],
+        p:[35.56,43.37,13.05,4.60,3.43], e:[39.63,44.79,9.78,2.57,3.03], c:[40.26,44.03,9.64,2.65,3.43], v:[37.54,45.71,11.00,2.58,3.17],
+        insight: '25-34岁转化占比45.7%为6类目里最高值之一，18-24+25-34合计转化占比达83.3%。' },
+      gender: { labels:['男','女'], p:[20.62,79.38], e:[22.74,77.26], c:[19.01,80.99], v:[19.59,80.41],
+        insight: '面膜类目性别结构全链路波动很小（79-81%女性），是6类目里性别投放精准度最好的一个，曝光端也没有出现明显的男性稀释问题。' },
+      loc: { labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],
+        p:[25.11,13.17,11.63,8.79,6.54,4.21], e:[20.50,15.67,13.84,7.12,5.73,4.48], c:[22.19,16.62,15.11,6.94,5.92,4.03], v:[25.44,16.28,15.67,8.00,7.04,3.83],
+        insight: '西爪哇转化占比25.4%，与品类大盘（25.1%）几乎持平，是6类目里地域分布最稳定的一个。' },
+      summary: {
+        problems: [
+          '<b>Gen Z高消费曝光端被放大后转化回落。</b>曝光/点击占比18.6%左右，转化回落到16.0%，存在一定浪费但幅度不大。',
+          '<b>中年高消费转化占比偏低。</b>品类7.40%到转化仅5.44%，与facial cleansers问题类似但幅度更小。'
+        ],
+        todos: [
+          '面膜类目整体投放精准度较好，可作为其他类目优化的参考基准（尤其是性别定向）。',
+          'Gen Z高消费素材可适当优化承接路径，减少点击→转化损耗。',
+          '中年高消费建议单独测试素材，观察能否提升转化效率。'
+        ]
+      }
+    },
+    MY: {
+      total: '1,210,291',
+      seg: { labels: ['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        p:[16.93,18.78,14.19,16.94,9.71,13.66,5.14,4.66],
+        e:[19.85,15.65,16.12,14.87,17.46,8.92,4.03,3.09],
+        c:[19.09,15.48,15.04,16.37,18.22,9.11,3.52,3.15],
+        v:[21.55,23.55,13.19,16.00,11.81,13.89,0,0],
+        insight: '<b>转化端样本偏小，仅6类人群有数据。</b>「中年低消费」转化占比23.55%为最高，年轻高消费/银发一族因样本不足缺失，结果仅供参考。' },
+      age: { labels:['18-24','25-34','35-44','45-54','55+'],
+        p:[23.90,39.01,22.90,9.53,4.66], e:[33.58,38.76,18.77,5.80,3.09], c:[33.26,38.99,18.94,5.66,3.15], v:[26.26,43.60,30.14,0,0],
+        insight: '转化端仅18-24/25-34/35-44三个年龄段有数据，45+样本不足；25-34岁占比43.6%为该类目最高。' },
+      gender: { labels:['男','女'], p:[17.09,82.91], e:[17.77,82.23], c:[14.25,85.75], v:[13.80,86.20],
+        insight: 'MY face masks女性占比全链路稳定在82-86%，与ID类似，是两国里性别精准度都较好的类目。' },
+      loc: { labels:['雪兰莪','吉隆坡','柔佛','沙巴','砂拉越','霹雳'],
+        p:[33.69,13.56,9.56,6.03,5.97,4.77], e:[31.82,13.83,8.88,6.96,6.95,4.79], c:[31.94,14.28,8.92,6.11,6.27,5.05], v:[58.34,24.66,17.00,0,0,0],
+        insight: '<b>转化端样本极小，仅3个地区有数据</b>（雪兰莪58.3%/吉隆坡24.7%/槟城17.0%），不具备完整地域分布参考意义。' },
+      summary: {
+        problems: [
+          '<b>转化端多个维度样本不足。</b>策略人群缺失2类、年龄缺失45+、地域仅3个地区有数据，MY品类人群基数（121万）在六类目中偏小，转化数据置信度较低。',
+          '<b>年轻高消费/银发一族转化数据完全缺失。</b>无法评估这两类人群在该类目的表现。'
+        ],
+        todos: [
+          '该类目MY转化数据建议以更长周期（如近90天）重新拉取，提升样本量后再做结论。',
+          '短期内可参考ID face masks的人群结构作为投放假设。',
+          '优先关注「中年低消费」「精致妈妈」两类已有稳定数据支撑的人群。'
+        ]
+      }
+    },
+    cmp: {
+      seg: 'ID转化端集中在「年轻/Gen Z低消费」（合计46.5%），MY因样本不足仅6类人群有数据，「中年低消费」占比最高（23.6%），暂不完全可比。',
+      age: 'ID转化端25-34岁占比45.7%，MY同为25-34岁最高（43.6%）但45+样本缺失；两国年轻段结构类似，但MY数据完整度较低。',
+      gender: '两国face masks都是女性高度主导且链路稳定（ID 80% / MY 86%），是两国里性别投放精准度都较好的类目。'
+    }
+  }
+};
+
+</script>
+<script>
+Chart.defaults.font.family = "-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = "#6B7280";
+
+const stage1 = getComputedStyle(document.documentElement).getPropertyValue('--stage1');
+const stage2 = getComputedStyle(document.documentElement).getPropertyValue('--stage2');
+const stage3 = getComputedStyle(document.documentElement).getPropertyValue('--stage3');
+const stage4 = getComputedStyle(document.documentElement).getPropertyValue('--stage4');
+const idColor = getComputedStyle(document.documentElement).getPropertyValue('--id');
+const myColor = getComputedStyle(document.documentElement).getPropertyValue('--my');
+
+let charts = {};
+function destroyChart(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+
+function groupedChart(id, labels, datasets, maxY, rot){
+  destroyChart(id);
+  const ctx = document.getElementById(id);
+  charts[id] = new Chart(ctx, {
+    type:'bar',
+    data:{ labels: labels, datasets: datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      layout:{ padding:{ top:10 } },
+      plugins:{
+        legend:{ position:'top', labels:{ boxWidth:10, font:{size:11.5} } },
+        tooltip:{ callbacks:{ label:(c)=> c.dataset.label + '：' + c.parsed.y + '%' } }
+      },
+      scales:{
+        x:{ grid:{display:false}, ticks:{ font:{size:11}, maxRotation: rot||0, minRotation:0 } },
+        y:{ beginAtZero:true, max:maxY, grid:{color:'#EEF0F3'}, ticks:{ callback:(v)=> v+'%', font:{size:10.5} } }
+      }
+    }
+  });
+}
+
+function stageDatasets(d){
+  return [
+    { label:'品类人群', backgroundColor: stage1, borderRadius:3, data:d.p },
+    { label:'曝光',     backgroundColor: stage2, borderRadius:3, data:d.e },
+    { label:'点击',     backgroundColor: stage3, borderRadius:3, data:d.c },
+    { label:'转化',     backgroundColor: stage4, borderRadius:3, data:d.v }
+  ];
+}
+function marketDatasets(idData, myData){
+  return [
+    { label:'ID', backgroundColor: idColor, borderRadius:3, data:idData },
+    { label:'MY', backgroundColor: myColor, borderRadius:3, data:myData }
+  ];
+}
+function fillList(elId, items){
+  const el = document.getElementById(elId);
+  el.innerHTML = items.map(t=>`<li>${t}</li>`).join('');
+}
+function maxOf(arrs, pad){ return Math.ceil(Math.max(...arrs.flat())/5)*5 + (pad||5); }
+
+function renderMarket(prefix, d, catTotalLabel){
+  document.getElementById('legend-'+prefix).innerHTML = `
+    <span class="legend-item"><span class="dot" style="background:${stage1}"></span>品类人群（${d.total}）</span>
+    <span class="legend-item"><span class="dot" style="background:${stage2}"></span>曝光</span>
+    <span class="legend-item"><span class="dot" style="background:${stage3}"></span>点击</span>
+    <span class="legend-item"><span class="dot" style="background:${stage4}"></span>转化</span>`;
+
+  groupedChart(prefix+'_seg', d.seg.labels, stageDatasets(d.seg), maxOf([d.seg.p,d.seg.e,d.seg.c,d.seg.v]));
+  document.getElementById(prefix+'_seg_insight').textContent = d.seg.insight;
+
+  groupedChart(prefix+'_age', d.age.labels, stageDatasets(d.age), maxOf([d.age.p,d.age.e,d.age.c,d.age.v]));
+  document.getElementById(prefix+'_age_insight').textContent = d.age.insight;
+
+  groupedChart(prefix+'_gender', d.gender.labels, stageDatasets(d.gender), 100);
+  document.getElementById(prefix+'_gender_insight').textContent = d.gender.insight;
+
+  groupedChart(prefix+'_loc', d.loc.labels, stageDatasets(d.loc), maxOf([d.loc.p,d.loc.e,d.loc.c,d.loc.v]), 30);
+  document.getElementById(prefix+'_loc_insight').textContent = d.loc.insight;
+
+  fillList(prefix+'_problems', d.summary.problems);
+  fillList(prefix+'_todos', d.summary.todos);
+}
+
+function renderCompare(cat){
+  const id = PERSONA_DATA[cat].ID, my = PERSONA_DATA[cat].MY;
+  groupedChart('cmp_seg', PERSONA_DATA.segCanonical, marketDatasets(id.seg.v, my.seg.v), maxOf([id.seg.v,my.seg.v]));
+  document.getElementById('cmp_seg_insight').textContent = PERSONA_DATA[cat].cmp.seg;
+
+  groupedChart('cmp_age', PERSONA_DATA.ageLabels, marketDatasets(id.age.v, my.age.v), maxOf([id.age.v,my.age.v]));
+  document.getElementById('cmp_age_insight').textContent = PERSONA_DATA[cat].cmp.age;
+
+  groupedChart('cmp_gender', PERSONA_DATA.genderLabels, marketDatasets(id.gender.v, my.gender.v), 100);
+  document.getElementById('cmp_gender_insight').textContent = PERSONA_DATA[cat].cmp.gender;
+}
+
+let currentCat = 'skincare';
+function renderAll(cat){
+  currentCat = cat;
+  const c = PERSONA_DATA[cat];
+  document.getElementById('pageTitle').textContent = c.title + ' 类目人群画像';
+  document.getElementById('pageMeta').textContent = '策略人群口径：' + c.criteria + '　｜　品类人群→曝光→点击→转化，近60天';
+  renderMarket('id', c.ID);
+  renderMarket('my', c.MY);
+  renderCompare(cat);
+}
+
+// ---- category selector ----
+const catMeta = [
+  ['skincare','Skincare'], ['makeup','Makeup'], ['body','Body'],
+  ['mens_care',"Men's Care"], ['facial_cleansers','Facial Cleansers'], ['face_masks','Face Masks']
+];
+const catSelectEl = document.getElementById('catSelect');
+catMeta.forEach(([key,label],i)=>{
+  const btn = document.createElement('button');
+  btn.className = 'cat-btn' + (i===0?' active':'');
+  btn.textContent = label;
+  btn.dataset.cat = key;
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderAll(key);
+  });
+  catSelectEl.appendChild(btn);
+});
+
+// ---- market tabs ----
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.market-page').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+  });
+});
+
+renderAll('skincare');
+</script>
+
+</body>
+</html>
