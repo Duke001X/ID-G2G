@@ -264,6 +264,7 @@ table.exp tr:hover td{background:rgba(255,255,255,0.02)}
       <button class="chip" data-v="❤️" onclick="fEg('❤️')">❤️</button>
       <button class="chip" data-v="🔥" onclick="fEg('🔥')">🔥</button>
       <button class="chip" data-v="💅" onclick="fEg('💅')">💅</button>
+      <button class="chip" data-v="💃" onclick="fEg('💃')">💃</button>
       <button class="chip" data-v="AI" onclick="fEg('AI')">🤖 AI</button>
       <button class="chip" data-v="Official" onclick="fEg('Official')">📢 Official</button>
       <button class="chip" data-v="Other" onclick="fEg('Other')">Other</button>
@@ -335,8 +336,8 @@ table.exp tr:hover td{background:rgba(255,255,255,0.02)}
 
 <script>
 // ── Constants ──
-const EG_COLOR={'🍀':'#7B3FC0','❤️':'#E0607E','🔥':'#D85A30','💅':'#378ADD','AI':'#1D9E75','Official':'#888780','Other':'#F0A500'};
-const EG_LBL={'🍀':'🍀 Clover','❤️':'❤️ Heart','🔥':'🔥 Fire','💅':'💅 Nail','AI':'🤖 AI','Official':'📢 Official','Other':'🎭 Other'};
+const EG_COLOR={'🍀':'#7B3FC0','❤️':'#E0607E','🔥':'#D85A30','💅':'#378ADD','💃':'#E0A030','AI':'#1D9E75','Official':'#888780','Other':'#F0A500'};
+const EG_LBL={'🍀':'🍀 Clover','❤️':'❤️ Heart','🔥':'🔥 Fire','💅':'💅 Nail','💃':'💃 Dance','AI':'🤖 AI','Official':'📢 Official','Other':'🎭 Other'};
 const ACCS=['TT1','TT2','TT4','TT5','TT6','TT7','TT8'];
 const CT_COLORS=['#7B3FC0','#378ADD','#1D9E75','#D85A30','#F0A500','#E0607E','#888','#3ABFBF','#BA7517','#C0522F'];
 const LOW_METRICS=['cpm','cost'];
@@ -620,11 +621,11 @@ function renderCompare(recs,body){
   const ref=computeKPI(recs);
   const groups={
     'Live Room 🍀+❤️':recs.filter(d=>d.eg==='🍀'||d.eg==='❤️'),
-    'Short Video 🔥+💅':recs.filter(d=>d.eg==='🔥'||d.eg==='💅'),
+    'Short Video 🔥+💅+💃':recs.filter(d=>d.eg==='🔥'||d.eg==='💅'||d.eg==='💃'),
     '🤖 AI':recs.filter(d=>d.eg==='AI'),
     '📢 Official':recs.filter(d=>d.eg==='Official'),
   };
-  const colors={'Live Room 🍀+❤️':'#7B3FC0','Short Video 🔥+💅':'#378ADD','🤖 AI':'#1D9E75','📢 Official':'#888'};
+  const colors={'Live Room 🍀+❤️':'#7B3FC0','Short Video 🔥+💅+💃':'#378ADD','🤖 AI':'#1D9E75','📢 Official':'#888'};
   const grid=document.createElement('div');
   grid.style.cssText='display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px';
   // Benchmark card
@@ -637,7 +638,7 @@ function renderCompare(recs,body){
   body.appendChild(grid);
   // Deep dive by individual emoji
   const dd=document.createElement('div');dd.className='sec-title';dd.textContent='Deep Dive — Individual Emoji Types';body.appendChild(dd);
-  const egs=['🍀','❤️','🔥','💅','AI','Official','Other'];
+  const egs=['🍀','❤️','🔥','💅','💃','AI','Official','Other'];
   const dg=document.createElement('div');dg.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:8px';
   egs.forEach(eg=>{
     const gr=recs.filter(d=>d.eg===eg);
