@@ -106,6 +106,28 @@
     </div>
   </div>
 
+  <!-- ===== 4-country comparison page (no location) ===== -->
+  <div id="page-cmp" style="display:none;">
+    <div class="legend" id="cmp-legend"></div>
+    <div class="note">以下均取「转化人群」口径对比四国人群结构差异；样本不足/无数据的类别按0处理并在洞察中说明；地域维度不做对比。</div>
+
+    <div class="section">
+      <div class="section-head"><h2>策略人群 · 转化人群结构对比</h2></div>
+      <div class="chart-box" style="height:340px;"><canvas id="cmp_seg"></canvas></div>
+      <div class="insight mono" id="cmp_seg_insight"></div>
+    </div>
+    <div class="section">
+      <div class="section-head"><h2>年龄 · 转化人群结构对比</h2></div>
+      <div class="chart-box"><canvas id="cmp_age"></canvas></div>
+      <div class="insight mono" id="cmp_age_insight"></div>
+    </div>
+    <div class="section">
+      <div class="section-head"><h2>性别 · 转化人群结构对比</h2></div>
+      <div class="chart-box"><canvas id="cmp_gender"></canvas></div>
+      <div class="insight mono" id="cmp_gender_insight"></div>
+    </div>
+  </div>
+
   <footer>数据来源：TikTok Ads Manager 人群画像后台截图人工读数还原</footer>
 </div>
 
@@ -495,12 +517,31 @@ function renderMarketPage(cat, mkt){
   fillList('mkt_todos', d.summary.todos);
 }
 
+function renderCompare(cat){
+  document.getElementById('cmp-legend').innerHTML = MARKETS.map(m=>
+    `<span class="legend-item"><span class="dot" style="background:${MARKET_COLORS[m]}"></span>${MARKET_NAMES[m]}</span>`
+  ).join('');
+
+  const c = PERSONA_DATA[cat];
+  const segDatasets = MARKETS.map(m => ({ label:m, backgroundColor:MARKET_COLORS[m], borderRadius:3, data:c[m].seg.vCanon }));
+  groupedChart('cmp_seg', PERSONA_DATA.segCanonical, segDatasets, maxOf(MARKETS.map(m=>c[m].seg.vCanon)), 20);
+  document.getElementById('cmp_seg_insight').innerHTML = c.cmpSeg || '';
+
+  const ageDatasets = MARKETS.map(m => ({ label:m, backgroundColor:MARKET_COLORS[m], borderRadius:3, data:c[m].age.v }));
+  groupedChart('cmp_age', PERSONA_DATA.ageLabels, ageDatasets, maxOf(MARKETS.map(m=>c[m].age.v)));
+  document.getElementById('cmp_age_insight').innerHTML = c.cmpAge || '';
+
+  const genderDatasets = MARKETS.map(m => ({ label:m, backgroundColor:MARKET_COLORS[m], borderRadius:3, data:c[m].gender.v }));
+  groupedChart('cmp_gender', PERSONA_DATA.genderLabels, genderDatasets, 100);
+  document.getElementById('cmp_gender_insight').innerHTML = c.cmpGender || '';
+}
+
 function renderAll(cat){
   currentCat = cat;
   const c = PERSONA_DATA[cat];
   document.getElementById('pageTitle').textContent = c.title + ' 类目人群画像';
   document.getElementById('pageMeta').textContent = '策略人群口径：' + c.criteria + '　｜　品类人群→曝光→点击→转化，近60天';
-  renderMarketPage(cat, currentMarket);
+  if(currentMarket === 'CMP'){ renderCompare(cat); } else { renderMarketPage(cat, currentMarket); }
 }
 
 // ---- category selector ----
@@ -522,18 +563,27 @@ catMeta.forEach(([key,label],i)=>{
   catSelectEl.appendChild(btn);
 });
 
-// ---- market tabs (ID/MY/PH/TH) ----
+// ---- market tabs (ID/MY/PH/TH + 4-country comparison) ----
 const tabsEl = document.getElementById('marketTabs');
-MARKETS.forEach((m,i)=>{
+const tabDefs = [...MARKETS.map(m=>({key:m,label:MARKET_NAMES[m]})), {key:'CMP',label:'4国对比'}];
+tabDefs.forEach((t,i)=>{
   const btn = document.createElement('button');
   btn.className = 'tab-btn' + (i===0?' active':'');
-  btn.textContent = MARKET_NAMES[m];
-  btn.dataset.mkt = m;
+  btn.textContent = t.label;
+  btn.dataset.mkt = t.key;
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    currentMarket = m;
-    renderMarketPage(currentCat, m);
+    currentMarket = t.key;
+    if(t.key === 'CMP'){
+      document.getElementById('page-market').style.display = 'none';
+      document.getElementById('page-cmp').style.display = 'block';
+      renderCompare(currentCat);
+    } else {
+      document.getElementById('page-cmp').style.display = 'none';
+      document.getElementById('page-market').style.display = 'block';
+      renderMarketPage(currentCat, t.key);
+    }
   });
   tabsEl.appendChild(btn);
 });
