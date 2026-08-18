@@ -131,6 +131,34 @@
     </div>
   </div>
 
+  <!-- ===== free compare page (any product/category baseline, ID only) ===== -->
+  <div id="page-freecmp" style="display:none;">
+    <div class="note">勾选任意类目大盘或单品（可跨类目），下方图表将实时对比「转化人群」结构。地域对比基于印尼六省份口径，跨类目通用。</div>
+    <div class="section" style="padding-bottom:18px;">
+      <div class="section-head"><h2>选择对比对象</h2><span class="hint" id="freecmp-count"></span></div>
+      <div id="freecmp-picker"></div>
+    </div>
+    <div class="legend" id="freecmp-legend"></div>
+    <div id="freecmp-charts" style="display:none;">
+      <div class="section">
+        <div class="section-head"><h2>策略人群 · 对比</h2></div>
+        <div class="chart-box" style="height:340px;"><canvas id="freecmp_seg"></canvas></div>
+      </div>
+      <div class="section">
+        <div class="section-head"><h2>年龄 · 对比</h2></div>
+        <div class="chart-box"><canvas id="freecmp_age"></canvas></div>
+      </div>
+      <div class="section">
+        <div class="section-head"><h2>性别 · 对比</h2></div>
+        <div class="chart-box"><canvas id="freecmp_gender"></canvas></div>
+      </div>
+      <div class="section">
+        <div class="section-head"><h2>地域 · 对比</h2></div>
+        <div class="chart-box"><canvas id="freecmp_loc"></canvas></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== 4-country comparison page (no location) ===== -->
   <div id="page-cmp" style="display:none;">
     <div class="legend" id="cmp-legend"></div>
@@ -167,6 +195,118 @@ const PERSONA_DATA = {
   genderLabels: ['男','女'],
 
   skincare: { title:'Skincare', criteria:'面霜 + 精华',
+    products: {
+      '乙醇酸水': {
+        seg:{p:[23.19,15.65,14.50,14.21,12.77,9.36,6.26,4.06],e:[21.46,6.62,17.88,18.67,20.78,5.71,6.58,2.31],c:[21.27,7.02,16.19,19.62,20.29,6.35,6.74,2.33],v:[25.04,11.05,13.36,19.37,13.86,9.35,7.96,0],
+          insight:'精致妈妈占比全链路稳定在18-19%，明显高于skincare大盘（14.2%），是该单品的核心贡献人群之一。'},
+        age:{p:[27.27,43.66,17.79,7.22,4.06],e:[38.66,46.70,9.94,2.39,2.31],c:[36.48,47.83,10.88,2.49,2.33],v:[28.16,54.18,17.66,0,0],
+          insight:'转化端仅3个年龄段有数据，25-34岁占比54.2%为该单品最高。'},
+        gender:{p:[22.56,77.44],e:[19.34,80.66],c:[18.17,81.83],v:[19.65,80.35],
+          insight:'性别结构全链路稳定，无明显男性曝光浪费问题。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[23.82,15.76,11.91,8.55,6.68,3.51],e:[22.18,16.58,14.80,6.78,6.12,3.90],c:[24.80,17.64,15.37,7.20,6.51,3.56],v:[34.69,20.05,18.71,11.39,9.36,0],
+          insight:'转化端西爪哇占比34.7%，略高于大盘（30.5%）。'},
+        summary:{problems:['<b>精致妈妈占比显著高于大盘。</b>全链路18-19% vs 大盘12-14%，可关注该人群的素材匹配是否有针对性策略。'],
+          todos:['可考虑加大精致妈妈相关素材投入，验证是否能进一步提升转化。']}},
+      '377精华': {
+        seg:{p:[23.19,15.65,14.50,14.21,12.77,9.36,6.26,4.06],e:[20.19,6.74,22.28,13.42,22.80,6.47,4.53,3.58],c:[19.15,7.42,19.54,13.06,23.20,5.46,8.37,3.80],v:[24.99,10.34,20.46,14.81,19.87,9.53,0,0],
+          insight:'GenZ高消费占比曝光/点击均超22%，明显高于大盘（12.8%），转化端回落到19.9%但仍是主要贡献人群。'},
+        age:{p:[27.27,43.66,17.79,7.22,4.06],e:[45.08,40.35,8.14,2.86,3.58],c:[42.74,40.58,9.42,3.46,3.80],v:[39.44,43.87,16.69,0,0],
+          insight:'转化端仅3个年龄段有数据，35-44岁占比16.7%高于大盘（14.7%）。'},
+        gender:{p:[22.56,77.44],e:[59.97,40.03],c:[52.60,47.40],v:[39.70,60.30],
+          insight:'⚠️ 曝光阶段男性占比高达60.0%，是所有skincare单品/大盘里唯一男性主导的，转化端仍有39.7%，远超大盘（22.2%）。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[23.82,15.76,11.91,8.55,6.68,3.51],e:[26.38,16.28,16.06,7.24,6.44,2.95],c:[27.95,17.41,16.74,7.31,6.51,2.85],v:[43.41,22.95,22.41,11.24,0,0],
+          insight:'转化端西爪哇占比43.4%明显高于大盘，且仅4个地区有数据。'},
+        summary:{problems:['<b>男性占比全链路远超大盘。</b>曝光60.0%/转化39.7%（大盘22.2%），该单品可能是专门针对男性用户的产品线，建议确认是否符合预期。'],
+          todos:['确认该单品的目标人群定位是否本就偏男性，如果是则应保持当前定向策略，作为独立于skincare大盘的特例管理。']}},
+      '377面霜': {
+        seg:{p:[23.19,15.65,14.50,14.21,12.77,9.36,6.26,4.06],e:[23.74,17.38,15.72,9.76,13.32,9.09,7.83,3.17],c:[22.61,19.50,14.68,9.49,13.31,9.42,7.58,3.41],v:[24.14,22.39,14.28,10.10,11.65,10.50,6.92,0],
+          insight:'中年低消费占比转化端达22.4%，是skincare所有单品里最高，远超大盘（15.65%）。'},
+        age:{p:[27.27,43.66,17.79,7.22,4.06],e:[29.04,41.33,19.79,6.67,3.17],c:[27.99,39.68,21.04,7.87,3.41],v:[25.93,41.17,24.04,8.85,0],
+          insight:'35-44岁转化占比24.0%，是skincare单品里最高，年龄结构明显比大盘更成熟。'},
+        gender:{p:[22.56,77.44],e:[33.94,66.06],c:[33.20,66.80],v:[27.22,72.78],
+          insight:'曝光阶段男性占比33.9%高于大盘，但幅度不算极端，转化端收窄到27.2%。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[23.82,15.76,11.91,8.55,6.68,3.51],e:[27.06,17.91,16.65,7.58,5.89,2.63],c:[29.91,18.77,17.06,7.59,6.05,2.60],v:[42.01,19.92,19.40,10.05,8.63,0],
+          insight:'转化端西爪哇占比42.0%，明显高于大盘（30.5%）。'},
+        summary:{problems:['<b>年龄结构明显偏成熟。</b>35-44岁转化占比24.0%（大盘14.7%），中年低消费占比也远高于大盘，与377精华（偏年轻/男性）形成鲜明对比。'],
+          todos:['该单品用户结构与377精华差异很大，建议分开制定素材和定向策略，不要混用同一套打法。']}},
+      '视黄醇精华': {
+        seg:{p:[23.19,15.65,14.50,14.21,12.77,9.36,6.26,4.06],e:[27.72,13.84,16.14,14.01,13.03,6.88,5.72,2.66],c:[26.56,15.07,14.32,14.84,13.33,7.48,5.87,2.53],v:[0,0,0,0,0,0,0,0],
+          insight:'转化端策略人群暂无数据，样本不足；曝光/点击阶段结构与skincare大盘接近。'},
+        age:{p:[27.27,43.66,17.79,7.22,4.06],e:[29.17,47.45,16.81,3.91,2.66],c:[27.65,47.27,17.92,4.63,2.53],v:[0,100,0,0,0],
+          insight:'转化端样本极小，仅25-34岁有数据（100%），仅供参考。'},
+        gender:{p:[22.56,77.44],e:[22.29,77.71],c:[21.45,78.55],v:[0,100],
+          insight:'转化端样本极小仅女性有数据（100%），曝光/点击阶段结构健康、接近大盘。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[23.82,15.76,11.91,8.55,6.68,3.51],e:[27.58,17.86,17.69,7.72,5.76,0],c:[35.67,24.01,23.01,9.65,7.69,0],v:[100,0,0,0,0,0],
+          insight:'转化端样本极小仅西爪哇有数据（100%），点击阶段地域集中度已经明显高于大盘。'},
+        summary:{problems:['<b>转化端数据全面不足。</b>策略人群无数据，年龄/性别/地域都仅有单一样本点，暂无法形成有效分析。'],
+          todos:['建议拉长统计周期后重新评估该单品的转化端人群结构。']}},
+      '视黄醇面霜': {
+        seg:{p:[23.19,15.65,14.50,14.21,12.77,9.36,6.26,4.06],e:[26.10,11.45,16.72,15.42,14.85,6.59,6.32,2.55],c:[26.94,11.82,16.23,16.40,14.16,6.55,5.44,2.46],v:[28.85,11.34,15.91,16.04,13.26,8.32,6.28,0],
+          insight:'策略人群结构与skincare大盘较为接近，年轻低消费占比转化端28.9%为核心贡献人群。'},
+        age:{p:[27.27,43.66,17.79,7.22,4.06],e:[31.57,47.84,14.33,3.71,2.55],c:[30.39,48.78,14.93,3.44,2.46],v:[24.61,51.16,19.89,4.33,0],
+          insight:'25-34岁转化占比51.2%，高于大盘（45.6%）。'},
+        gender:{p:[22.56,77.44],e:[21.73,78.27],c:[18.28,81.72],v:[19.59,80.41],
+          insight:'性别结构健康，全链路无明显男性曝光浪费。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[23.82,15.76,11.91,8.55,6.68,3.51],e:[26.09,17.55,16.30,7.60,5.70,3.23],c:[27.88,19.71,18.39,7.78,5.41,2.77],v:[35.62,20.77,20.37,11.25,8.71,0],
+          insight:'转化端西爪哇占比35.6%，与大盘（30.5%）接近但略高。'},
+        summary:{problems:['<b>整体表现平稳。</b>各维度都与skincare大盘接近，暂未发现明显问题。'],
+          todos:['可作为skincare类目的对照基准之一。']}},
+      '美白精华': {
+        seg:{p:[23.19,15.65,14.50,14.21,12.77,9.36,6.26,4.06],e:[26.58,11.40,21.99,11.63,14.52,5.27,4.55,4.06],c:[26.45,11.32,21.93,12.15,14.24,5.29,4.18,4.43],v:[27.45,14.25,18.77,13.02,14.04,7.17,5.30,0],
+          insight:'GenZ低消费占比全链路稳定在19-22%，高于大盘（14.5%），是该单品的核心人群。'},
+        age:{p:[27.27,43.66,17.79,7.22,4.06],e:[36.51,42.76,12.87,3.80,4.06],c:[36.18,42.79,12.71,3.89,4.43],v:[32.82,45.77,16.79,4.63,0],
+          insight:'年龄结构与大盘接近，25-34岁转化占比45.8%。'},
+        gender:{p:[22.56,77.44],e:[21.12,78.88],c:[18.77,81.23],v:[19.35,80.65],
+          insight:'性别结构健康，无明显男性曝光浪费。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[23.82,15.76,11.91,8.55,6.68,3.51],e:[29.24,18.33,17.39,8.04,4.95,2.75],c:[31.51,20.42,19.26,8.38,4.88,2.44],v:[37.88,21.48,23.25,9.86,7.53,0],
+          insight:'转化端西爪哇占比37.9%，高于大盘（30.5%）。'},
+        summary:{problems:['<b>暂无突出问题。</b>GenZ低消费占比偏高但整体结构健康。'],
+          todos:['可关注GenZ低消费人群在该单品的转化效率，评估是否值得加大预算。']}},
+      '美白面霜': {
+        seg:{p:[23.19,15.65,14.50,14.21,12.77,9.36,6.26,4.06],e:[25.73,10.49,21.58,12.21,16.28,4.94,5.20,3.56],c:[25.45,10.67,20.77,12.81,16.63,5.04,5.17,3.46],v:[26.10,12.06,19.28,13.11,15.84,5.21,5.60,2.80],
+          insight:'策略人群结构与skincare大盘非常接近，各阶段数据完整，是数据质量最好的单品之一。'},
+        age:{p:[27.27,43.66,17.79,7.22,4.06],e:[37.86,43.15,11.93,3.50,3.56],c:[37.40,43.44,12.16,3.55,3.46],v:[35.12,44.42,13.93,3.73,2.80],
+          insight:'年龄结构全链路完整、与大盘接近，无异常波动。'},
+        gender:{p:[22.56,77.44],e:[22.82,77.18],c:[21.10,78.90],v:[20.73,79.27],
+          insight:'性别结构健康稳定，全链路都接近大盘水平。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[23.82,15.76,11.91,8.55,6.68,3.51],e:[26.79,17.08,16.80,7.38,4.76,2.92],c:[28.58,18.42,17.70,7.38,4.63,2.72],v:[38.56,19.58,18.01,9.94,6.75,2.44],
+          insight:'转化端西爪哇占比38.6%，是skincare单品里少有的地域数据完整（6地全有）的一个。'},
+        summary:{problems:['<b>暂无明显问题。</b>该单品各维度数据都完整且与大盘接近，是skincare类目里数据质量最好的单品。'],
+          todos:['可作为skincare类目的标准对照基准。']}},
+      'PDRN精华': {
+        seg:{p:[23.19,15.65,14.50,14.21,12.77,9.36,6.26,4.06],e:[23.83,9.06,18.90,16.15,16.98,6.44,5.91,2.74],c:[23.15,9.24,17.79,17.49,16.72,7.08,5.72,2.81],v:[25.34,14.33,14.22,17.04,11.81,10.62,6.65,0],
+          insight:'精致妈妈占比转化端达17.0%，明显高于大盘（14.2%），是该单品的重要贡献人群。'},
+        age:{p:[27.27,43.66,17.79,7.22,4.06],e:[35.88,45.89,12.30,3.99,2.74],c:[34.51,46.36,12.97,3.35,2.81],v:[26.02,49.03,20.52,4.43,0],
+          insight:'35-44岁转化占比20.5%，高于大盘（14.7%），年龄结构略偏成熟。'},
+        gender:{p:[22.56,77.44],e:[19.43,80.57],c:[17.47,82.53],v:[18.38,81.62],
+          insight:'性别结构健康，全链路无明显男性曝光浪费。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[23.82,15.76,11.91,8.55,6.68,3.51],e:[27.43,19.37,18.03,7.18,5.69,2.68],c:[29.71,19.96,18.36,7.39,5.74,2.56],v:[37.83,22.60,22.38,9.12,8.07,0],
+          insight:'转化端西爪哇占比37.8%，高于大盘（30.5%）。'},
+        summary:{problems:['<b>暂无突出问题。</b>精致妈妈占比偏高但整体结构健康。'],
+          todos:['可关注精致妈妈人群在PDRN系列（精华+面霜+combo）的整体转化贡献，评估是否值得作为该系列的核心定向人群。']}},
+      'PDRN面霜': {
+        seg:{p:[23.19,15.65,14.50,14.21,12.77,9.36,6.26,4.06],e:[26.28,10.19,21.41,13.66,15.35,5.42,4.36,3.33],c:[25.97,10.33,19.69,15.22,15.42,5.84,4.28,3.24],v:[29.55,15.36,14.27,15.86,11.04,8.66,5.25,0],
+          insight:'年轻低消费占比转化端达29.6%，是PDRN系列里最高，且高于skincare大盘（24.9%）。'},
+        age:{p:[27.27,43.66,17.79,7.22,4.06],e:[36.76,44.30,12.20,3.41,3.33],c:[35.11,45.48,12.74,3.43,3.24],v:[25.31,50.66,19.95,4.08,0],
+          insight:'25-34岁转化占比50.7%，是PDRN系列里最高。'},
+        gender:{p:[22.56,77.44],e:[18.06,81.94],c:[16.27,83.73],v:[17.54,82.46],
+          insight:'女性占比全链路都在82%左右，是PDRN系列里女性集中度最高的单品。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[23.82,15.76,11.91,8.55,6.68,3.51],e:[26.19,21.26,20.71,6.69,4.64,2.77],c:[27.75,22.47,21.60,6.81,4.55,2.66],v:[35.47,25.19,24.89,8.11,6.34,0],
+          insight:'东爪哇+中爪哇省合计转化占比50.1%，比其他skincare单品更集中在爪哇岛中东部。'},
+        summary:{problems:['<b>暂无突出问题。</b>该单品各维度表现健康，女性集中度和年轻化程度都是PDRN系列里最好的。'],
+          todos:['可作为PDRN系列的主推单品，素材和预算可优先向该单品倾斜。']}},
+      'PDRNcombo': {
+        seg:{p:[23.19,15.65,14.50,14.21,12.77,9.36,6.26,4.06],e:[23.85,8.18,16.36,16.50,17.69,6.46,7.12,1.83],c:[24.28,9.71,13.12,20.54,15.39,8.03,7.36,1.57],v:[27.05,14.69,11.44,17.88,11.18,10.45,7.30,0],
+          insight:'精致妈妈占比点击端达20.5%，转化端仍有17.9%，是PDRN系列里精致妈妈占比最高的单品，符合"套装"产品更受家庭型用户欢迎的直觉。'},
+        age:{p:[27.27,43.66,17.79,7.22,4.06],e:[34.06,49.48,12.22,2.42,1.83],c:[28.51,52.19,15.00,2.73,1.57],v:[22.62,52.23,21.32,3.82,0],
+          insight:'25-34岁转化占比52.2%，全链路持续放大，是PDRN系列里年龄集中度最高的。'},
+        gender:{p:[22.56,77.44],e:[20.57,79.43],c:[18.88,81.12],v:[19.32,80.68],
+          insight:'性别结构健康，与PDRN精华/面霜走势一致。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[23.82,15.76,11.91,8.55,6.68,3.51],e:[21.01,15.75,15.13,5.86,5.31,3.63],c:[22.98,17.11,16.04,5.99,5.58,2.66],v:[35.63,23.44,23.02,9.07,8.85,0],
+          insight:'地域结构与PDRN精华/面霜类似，西爪哇转化占比35.6%。'},
+        summary:{problems:['<b>暂无突出问题。</b>精致妈妈占比明显高于系列内其他单品，符合套装产品的用户预期。'],
+          todos:['可对比PDRN精华/面霜/combo三个单品的精致妈妈占比差异，验证"套装吸引家庭用户"的假设是否成立，作为后续选品/定价参考。']}}
+    },
     cmpSeg:'ID/MY转化端集中在低消费/Gen Z人群，TH「Gen Z高消费」占比最高（21.2%），PH因样本不足暂无数据——四国消费力结构差异明显。',
     cmpAge:'TH 25-34岁转化占比47.3%为四国最高，PH仅18-24/25-34两段有数据（各约50%），ID/MY年龄结构相对更完整均衡。',
     cmpGender:'TH男性转化占比高达41.8%，远超ID(22.2%)/MY(20.2%)，PH因样本极小仅女性有数据——TH是四国里性别结构最特殊的市场。',
@@ -217,6 +357,41 @@ const PERSONA_DATA = {
   },
 
   makeup: { title:'Makeup', criteria:'底妆 + 粉饼',
+    products: {
+      '有色面霜': {
+        seg:{p:[21.40,13.13,15.51,16.40,16.25,8.43,5.22,3.66],e:[23.26,8.38,24.77,13.09,18.91,4.16,3.42,4.01],c:[22.35,7.87,25.73,13.33,19.48,4.19,2.70,4.35],v:[21.69,8.31,23.30,14.74,19.84,4.96,3.45,3.73],
+          insight:'GenZ低消费占比全链路稳定在23-26%，是有色面霜里最主要的贡献人群，与makeup大盘（15.5%）相比明显更集中。'},
+        age:{p:[31.75,43.02,15.38,6.58,3.66],e:[43.68,39.77,9.44,3.10,4.01],c:[45.21,38.38,8.80,3.25,4.35],v:[43.13,39.87,9.88,3.39,3.73],
+          insight:'18-24岁占比全链路都在43-45%，明显高于makeup大盘（32-38%区间），是偏年轻化的单品。'},
+        gender:{p:[16.10,83.90],e:[14.43,85.57],c:[11.74,88.26],v:[12.46,87.54],
+          insight:'女性占比全链路都在85%以上，比makeup大盘（81-85%）更集中。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[25.81,14.32,11.60,8.98,7.19,3.40],e:[26.34,13.58,14.83,7.15,4.89,3.94],c:[29.23,13.94,15.94,7.60,4.87,3.38],v:[36.26,14.31,18.14,10.06,6.81,3.56],
+          insight:'转化端西爪哇占比36.3%，明显高于makeup大盘（29.5%），地域集中度是三个makeup单品里最高的。'},
+        summary:{problems:['<b>西爪哇集中度偏高。</b>转化占比36.3%（大盘29.5%），其他地区渗透空间有限。'],
+          todos:['评估中爪哇省、雅加达等第二梯队地区的追加投放空间。']}},
+      '粉色气垫': {
+        seg:{p:[21.40,13.13,15.51,16.40,16.25,8.43,5.22,3.66],e:[22.98,7.55,24.48,14.20,20.43,3.94,3.30,3.13],c:[23.23,7.63,24.25,14.46,19.78,4.09,3.27,3.29],v:[21.36,7.48,21.77,17.68,22.46,4.82,4.43,0],
+          insight:'GenZ高消费占比转化端达22.46%为三个makeup单品里最高，精致妈妈占比也随链路持续走高（曝光14.2%→转化17.7%）。'},
+        age:{p:[31.75,43.02,15.38,6.58,3.66],e:[44.91,40.48,8.86,2.62,3.13],c:[44.03,40.97,9.02,2.70,3.29],v:[45.48,44.70,9.81,0,0],
+          insight:'转化端仅3个年龄段有数据，18-24/25-34合计占比90.2%。'},
+        gender:{p:[16.10,83.90],e:[13.83,86.17],c:[13.11,86.89],v:[13.51,86.49],
+          insight:'女性占比全链路稳定在86-87%，数据完整、无明显波动。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[25.81,14.32,11.60,8.98,7.19,3.40],e:[23.31,13.59,14.11,6.77,4.77,4.11],c:[26.28,14.06,15.24,7.43,4.35,3.98],v:[34.60,15.18,18.02,10.84,6.25,5.54],
+          insight:'转化端西爪哇占比34.6%，中爪哇省占比18.0%也高于大盘（11.6%），两地合计贡献过半转化。'},
+        summary:{problems:['<b>暂无突出问题。</b>此前点击/转化数据重复的问题已由业务方更新修正，当前三阶段数据均已区分。'],
+          todos:['GenZ高消费+精致妈妈是核心贡献人群，可作为素材优化重点。']}},
+      '水光气垫': {
+        seg:{p:[21.40,13.13,15.51,16.40,16.25,8.43,5.22,3.66],e:[20.87,7.07,24.26,14.32,22.08,4.22,3.49,3.69],c:[20.17,6.58,23.89,15.15,22.88,4.28,3.57,3.67],v:[20.41,7.05,23.23,18.17,25.62,5.52,0,0],
+          insight:'GenZ高消费占比在转化端达到25.62%，是三个makeup单品里最高的，且随链路持续走高（曝光22.1%→转化25.6%），承接效率较好。'},
+        age:{p:[31.75,43.02,15.38,6.58,3.66],e:[46.34,38.69,8.43,2.85,3.69],c:[46.76,38.70,8.10,2.76,3.67],v:[48.06,42.46,9.48,0,0],
+          insight:'18-24岁转化占比48.1%，为三个makeup单品里最高，年轻化趋势最明显。'},
+        gender:{p:[16.10,83.90],e:[14.54,85.46],c:[13.07,86.93],v:[13.80,86.20],
+          insight:'女性占比全链路稳定在85-87%，是三个单品里数据最完整、走势最平稳的一个。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[25.81,14.32,11.60,8.98,7.19,3.40],e:[24.36,13.99,14.29,6.85,4.71,3.99],c:[26.35,14.47,15.72,7.22,4.39,3.79],v:[41.37,17.38,21.25,11.92,8.08,0],
+          insight:'转化端西爪哇占比41.4%为三个makeup单品里最高，叠加GenZ高消费和18-24岁的双重年轻化特征，地域集中度也最突出。'},
+        summary:{problems:['<b>地域集中度最高。</b>转化端西爪哇占比41.4%，明显高于makeup大盘（29.5%）及其他两个单品。'],
+          todos:['GenZ高消费+18-24岁+西爪哇三重集中特征明显，可作为年轻向、区域化素材测试的重点单品。']}}
+    },
     cmpSeg:'ID转化集中在年轻/GenZ人群（合计61%），TH/MY「精致妈妈」占比领先，PH样本极小仅2类人群有数据，四国核心人群结构差异显著。',
     cmpAge:'PH 18-24岁转化占比53.2%为四国最高（样本小），TH 55+占比8.26%为四国最高，MY 35-44岁占比21.9%明显高于其他三国。',
     cmpGender:'四国女性均主导（82-88%），MY最集中（88.4%），PH相对最低（82.6%），差异不算大。',
@@ -402,6 +577,41 @@ const PERSONA_DATA = {
   },
 
   facial_cleansers: { title:'Facial Cleansers', criteria:'除火山泥洁面外的洁面',
+    products: {
+      '美白洁面': {
+        seg:{p:[24.84,14.94,17.61,11.91,12.39,7.91,6.55,3.85],e:[25.63,9.61,22.77,8.19,17.10,8.90,4.31,3.48],c:[26.17,10.43,21.49,9.43,16.24,4.88,7.77,3.60],v:[29.11,13.45,20.03,10.27,12.63,5.84,5.55,3.12],
+          insight:'年轻低消费占比转化端达29.1%，是三个facial cleansers单品里最高；中年低消费转化端占比13.45%，也高于大盘（11.34%）。'},
+        age:{p:[30.00,43.30,16.66,6.20,3.85],e:[39.87,43.43,10.27,2.94,3.48],c:[37.73,43.37,11.99,3.31,3.60],v:[32.66,44.93,15.55,3.73,3.12],
+          insight:'35-44岁转化占比15.6%，明显高于大盘（13.2%），年龄结构比大盘更宽。'},
+        gender:{p:[28.85,71.15],e:[44.90,55.10],c:[36.46,63.54],v:[26.81,73.19],
+          insight:'⚠️ 曝光阶段男女比例接近5:5（44.9%/55.1%），是三个洁面单品里男性占比最高的，但点击/转化迅速收窄到27%左右，浪费幅度较大。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[27.11,15.59,12.52,9.24,7.81,3.10],e:[23.54,17.53,15.86,7.15,4.72,3.44],c:[26.89,18.03,16.57,7.82,4.61,3.18],v:[36.23,16.46,16.42,10.78,6.34,2.92],
+          insight:'西爪哇转化占比36.2%，高于大盘（35.3%），地域集中度略高于facial cleansers大盘。'},
+        summary:{problems:['<b>曝光阶段男性占比接近一半。</b>44.9%（大盘28.9%），是该类目里男性曝光浪费最明显的单品，点击/转化又收窄到27%左右。'],
+          todos:['优先复核该单品曝光端男性定向来源，对照facial cleansers大盘的曝光结构做调整。']}},
+      '牛奶洁面': {
+        seg:{p:[24.84,14.94,17.61,11.91,12.39,7.91,6.55,3.85],e:[23.65,9.42,22.62,9.28,19.23,8.39,4.56,2.86],c:[24.76,10.40,19.08,11.81,17.33,5.88,7.94,2.79],v:[29.61,13.77,20.84,16.81,18.96,0,0,0],
+          insight:'精致妈妈转化占比16.81%，是三个洁面单品里最高，且远超大盘（10.30%）；转化端仅5类人群有数据，中年高消费/年轻高消费/银发一族样本缺失。'},
+        age:{p:[30.00,43.30,16.66,6.20,3.85],e:[41.84,42.34,10.11,2.84,2.86],c:[36.41,44.51,12.96,3.32,2.79],v:[35.33,48.54,16.13,0,0],
+          insight:'转化端仅3个年龄段有数据，25-34岁占比48.5%为三个洁面单品里最高。'},
+        gender:{p:[28.85,71.15],e:[43.83,56.17],c:[33.23,66.77],v:[26.08,73.92],
+          insight:'曝光阶段男性占比43.8%同样偏高（大盘28.9%），与美白洁面问题模式一致。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[27.11,15.59,12.52,9.24,7.81,3.10],e:[26.32,19.47,16.45,7.98,5.63,2.97],c:[30.34,21.47,17.39,8.56,5.87,2.95],v:[43.34,22.98,20.37,13.31,0,0],
+          insight:'转化端仅4个地区有数据，西爪哇占比43.3%为三个洁面单品里地域集中度最高的。'},
+        summary:{problems:['<b>曝光阶段男性占比同样偏高。</b>43.8%（大盘28.9%），与美白洁面是同一问题模式，两个单品可能用了相似的曝光定向。','<b>转化端多个维度样本收窄。</b>策略人群仅5类、年龄仅3组、地域仅4地有数据。'],
+          todos:['与美白洁面一并排查曝光端男性定向来源，可能是共用计划模板导致。']}},
+      '蓝莓洁面': {
+        seg:{p:[24.84,14.94,17.61,11.91,12.39,7.91,6.55,3.85],e:[24.20,8.97,24.94,10.16,17.42,4.41,5.38,4.52],c:[24.60,9.30,24.63,10.63,16.80,4.52,5.12,4.40],v:[24.22,9.48,23.39,11.33,17.37,5.01,5.91,3.28],
+          insight:'三个洁面单品里策略人群结构最接近facial cleansers大盘，全链路波动最小，属于"标准款"单品。'},
+        age:{p:[30.00,43.30,16.66,6.20,3.85],e:[42.36,39.74,9.85,3.52,4.52],c:[41.44,40.34,10.29,3.53,4.40],v:[40.76,41.46,11.08,3.41,3.28],
+          insight:'年龄结构全链路完整、与大盘接近，是三个洁面单品里数据完整度最好的一个。'},
+        gender:{p:[28.85,71.15],e:[27.88,72.12],c:[25.98,74.02],v:[26.30,73.70],
+          insight:'⚠️ 性别结构全链路都与大盘接近且没有曝光端男性放大问题，是三个洁面单品里唯一没有男性浪费问题的。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[27.11,15.59,12.52,9.24,7.81,3.10],e:[26.78,15.83,16.06,7.19,4.48,3.28],c:[30.12,17.03,17.29,7.84,4.46,3.15],v:[43.62,17.91,19.58,11.73,7.15,0],
+          insight:'转化端西爪哇占比43.6%明显放大（品类26.8%），是三个单品里唯一在地域上有明显集中趋势的。'},
+        summary:{problems:['<b>暂无明显问题。</b>该单品性别、年龄结构都健康，是三个洁面单品里表现最稳定的一个。'],
+          todos:['可作为facial cleansers类目的对照基准，用于衡量美白洁面、牛奶洁面的曝光端男性占比是否异常。']}}
+    },
     cmpSeg:'ID/MY转化集中在低消费/Gen Z人群，TH分布最均衡（前三类差距<5pp），PH样本极小仅Gen Z低消费100%，四国结构差异明显。',
     cmpAge:'PH 18-24岁转化占比60.5%为四国最高（样本小），TH 55+占比10.90%为四国最高，MY 35-44岁占比21.8%远高于ID的13.2%。',
     cmpGender:'ID/MY都出现曝光端男性被过度放大的问题，TH男性转化占比走高（35.2%）与body/skincare模式一致，PH数据相对稳定（22-33%区间）。',
@@ -641,30 +851,32 @@ function renderProductSelector(cat){
   const allBtn = document.createElement('button');
   allBtn.className = 'cat-btn' + (currentProduct===null && !showProductCompare?' active':'');
   allBtn.textContent = '品类大盘';
-  allBtn.addEventListener('click', ()=>{ currentProduct = null; showProductCompare = false; renderProductSelector(cat); showMarketPage(); renderMarketPage(cat, currentMarket); });
+  allBtn.addEventListener('click', ()=>{ currentProduct = null; showProductCompare = false; onFreeCmpPage = false; renderProductSelector(cat); showMarketPage(); renderMarketPage(cat, currentMarket); });
   wrap.appendChild(allBtn);
   Object.keys(PERSONA_DATA[cat].products).forEach(name=>{
     const btn = document.createElement('button');
     btn.className = 'cat-btn' + (currentProduct===name && !showProductCompare?' active':'');
     btn.textContent = name;
-    btn.addEventListener('click', ()=>{ currentProduct = name; showProductCompare = false; renderProductSelector(cat); showMarketPage(); renderMarketPage(cat, currentMarket); });
+    btn.addEventListener('click', ()=>{ currentProduct = name; showProductCompare = false; onFreeCmpPage = false; renderProductSelector(cat); showMarketPage(); renderMarketPage(cat, currentMarket); });
     wrap.appendChild(btn);
   });
   const cmpBtn = document.createElement('button');
   cmpBtn.className = 'cat-btn' + (showProductCompare?' active':'');
   cmpBtn.textContent = '单品对比 ⇄';
-  cmpBtn.addEventListener('click', ()=>{ showProductCompare = true; renderProductSelector(cat); showProdCmpPage(); renderProductCompare(cat); });
+  cmpBtn.addEventListener('click', ()=>{ showProductCompare = true; onFreeCmpPage = false; renderProductSelector(cat); showProdCmpPage(); renderProductCompare(cat); });
   wrap.appendChild(cmpBtn);
 }
 
 function showMarketPage(){
   document.getElementById('page-cmp').style.display = 'none';
   document.getElementById('page-prodcmp').style.display = 'none';
+  document.getElementById('page-freecmp').style.display = 'none';
   document.getElementById('page-market').style.display = 'block';
 }
 function showProdCmpPage(){
   document.getElementById('page-market').style.display = 'none';
   document.getElementById('page-cmp').style.display = 'none';
+  document.getElementById('page-freecmp').style.display = 'none';
   document.getElementById('page-prodcmp').style.display = 'block';
 }
 
@@ -689,8 +901,9 @@ function renderProductCompare(cat){
   groupedChart('prodcmp_gender', PERSONA_DATA.genderLabels, genderDatasets, 100);
 
   const locLabels = c.ID.loc.labels;
-  const locDatasets = allEntities.map(en => ({ label:en.key, backgroundColor:en.color, borderRadius:3, data:en.d.loc.v }));
-  groupedChart('prodcmp_loc', locLabels, locDatasets, maxOf(allEntities.map(en=>en.d.loc.v)), 20);
+  const zeroLoc = locLabels.map(()=>0);
+  const locDatasets = allEntities.map(en => ({ label:en.key, backgroundColor:en.color, borderRadius:3, data: en.d.loc ? en.d.loc.v : zeroLoc }));
+  groupedChart('prodcmp_loc', locLabels, locDatasets, maxOf(allEntities.map(en=> en.d.loc ? en.d.loc.v : zeroLoc)), 20);
 }
 
 function renderMarketPage(cat, mkt){
@@ -712,8 +925,14 @@ function renderMarketPage(cat, mkt){
   groupedChart('mkt_gender', PERSONA_DATA.genderLabels, stageDatasets(d.gender), 100);
   document.getElementById('mkt_gender_insight').innerHTML = d.gender.insight;
 
-  groupedChart('mkt_loc', d.loc.labels, stageDatasets(d.loc), maxOf([d.loc.p,d.loc.e,d.loc.c,d.loc.v]), 20);
-  document.getElementById('mkt_loc_insight').innerHTML = d.loc.insight;
+  const locBox = document.getElementById('mkt_loc').closest('.section');
+  if(d.loc){
+    locBox.style.display = '';
+    groupedChart('mkt_loc', d.loc.labels, stageDatasets(d.loc), maxOf([d.loc.p,d.loc.e,d.loc.c,d.loc.v]), 20);
+    document.getElementById('mkt_loc_insight').innerHTML = d.loc.insight;
+  } else {
+    locBox.style.display = 'none';
+  }
 
   const titleSuffix = (mkt==='ID' && currentProduct) ? (currentProduct + ' · ' + MARKET_NAMES[mkt]) : MARKET_NAMES[mkt];
   document.getElementById('mkt_summary_title').textContent = titleSuffix + ' 小结';
@@ -740,6 +959,95 @@ function renderCompare(cat){
   document.getElementById('cmp_gender_insight').innerHTML = c.cmpGender || '';
 }
 
+function showFreeCmpPage(){
+  document.getElementById('page-market').style.display = 'none';
+  document.getElementById('page-cmp').style.display = 'none';
+  document.getElementById('page-prodcmp').style.display = 'none';
+  document.getElementById('page-freecmp').style.display = 'block';
+}
+
+const FREECMP_CAT_LABELS = { skincare:'Skincare', makeup:'Makeup', body:'Body', mens_care:"Men's Care", facial_cleansers:'Facial Cleansers', face_masks:'Face Masks' };
+const freecmpSelected = new Set();
+const freecmpPalette = ['#C9776A','#6C8FD1','#7FB37F','#D9A24B','#B87FC9','#5AAFAF','#E39B8F','#8FC7B8','#D6A2E8','#9FB86B'];
+
+function freecmpEntityId(cat, key){ return cat + '::' + key; }
+function freecmpGetEntity(id){
+  const [cat, key] = id.split('::');
+  if(key === '__baseline__') return { label: FREECMP_CAT_LABELS[cat] + ' 大盘', d: PERSONA_DATA[cat].ID };
+  return { label: FREECMP_CAT_LABELS[cat] + ' · ' + key, d: PERSONA_DATA[cat].products[key] };
+}
+
+function renderFreeComparePicker(){
+  const wrap = document.getElementById('freecmp-picker');
+  wrap.innerHTML = '';
+  Object.keys(FREECMP_CAT_LABELS).forEach(cat=>{
+    const row = document.createElement('div');
+    row.style.marginBottom = '10px';
+    const title = document.createElement('div');
+    title.style.cssText = 'font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;';
+    title.textContent = FREECMP_CAT_LABELS[cat];
+    row.appendChild(title);
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;';
+    const baseId = freecmpEntityId(cat, '__baseline__');
+    btnRow.appendChild(makeFreecmpChip(baseId, FREECMP_CAT_LABELS[cat] + ' 大盘'));
+    const prods = PERSONA_DATA[cat].products;
+    if(prods){
+      Object.keys(prods).forEach(name=>{
+        btnRow.appendChild(makeFreecmpChip(freecmpEntityId(cat,name), name));
+      });
+    }
+    row.appendChild(btnRow);
+    wrap.appendChild(row);
+  });
+}
+function makeFreecmpChip(id, label){
+  const btn = document.createElement('button');
+  btn.className = 'cat-btn' + (freecmpSelected.has(id)?' active':'');
+  btn.style.fontSize = '12.5px';
+  btn.textContent = label;
+  btn.addEventListener('click', ()=>{
+    if(freecmpSelected.has(id)) freecmpSelected.delete(id); else freecmpSelected.add(id);
+    renderFreeComparePicker();
+    renderFreeCompare();
+  });
+  return btn;
+}
+
+function renderFreeCompare(){
+  document.getElementById('freecmp-count').textContent = freecmpSelected.size + ' 项已选';
+  const chartsWrap = document.getElementById('freecmp-charts');
+  const legendWrap = document.getElementById('freecmp-legend');
+  if(freecmpSelected.size === 0){
+    chartsWrap.style.display = 'none';
+    legendWrap.innerHTML = '';
+    return;
+  }
+  chartsWrap.style.display = 'block';
+  const ids = Array.from(freecmpSelected);
+  const entities = ids.map((id,i)=>({ id, ...freecmpGetEntity(id), color: freecmpPalette[i % freecmpPalette.length] }));
+
+  legendWrap.innerHTML = entities.map(en=>
+    `<span class="legend-item"><span class="dot" style="background:${en.color}"></span>${en.label}</span>`
+  ).join('');
+
+  const segDatasets = entities.map(en => ({ label:en.label, backgroundColor:en.color, borderRadius:3, data:en.d.seg.v }));
+  groupedChart('freecmp_seg', PERSONA_DATA.segCanonical, segDatasets, maxOf(entities.map(en=>en.d.seg.v)), 20);
+
+  const ageDatasets = entities.map(en => ({ label:en.label, backgroundColor:en.color, borderRadius:3, data:en.d.age.v }));
+  groupedChart('freecmp_age', PERSONA_DATA.ageLabels, ageDatasets, maxOf(entities.map(en=>en.d.age.v)));
+
+  const genderDatasets = entities.map(en => ({ label:en.label, backgroundColor:en.color, borderRadius:3, data:en.d.gender.v }));
+  groupedChart('freecmp_gender', PERSONA_DATA.genderLabels, genderDatasets, 100);
+
+  const locLabels = PERSONA_DATA.skincare.ID.loc.labels;
+  const zeroLoc = locLabels.map(()=>0);
+  const locDatasets = entities.map(en => ({ label:en.label, backgroundColor:en.color, borderRadius:3, data: en.d.loc ? en.d.loc.v : zeroLoc }));
+  groupedChart('freecmp_loc', locLabels, locDatasets, maxOf(entities.map(en=> en.d.loc ? en.d.loc.v : zeroLoc)), 20);
+}
+
+let onFreeCmpPage = false;
+
 function renderAll(cat){
   currentCat = cat;
   const c = PERSONA_DATA[cat];
@@ -748,7 +1056,9 @@ function renderAll(cat){
   currentProduct = null;
   showProductCompare = false;
   renderProductSelector(cat);
-  if(currentMarket === 'CMP'){ renderCompare(cat); } else { showMarketPage(); renderMarketPage(cat, currentMarket); }
+  if(onFreeCmpPage){ /* stay on free-compare page, category buttons don't affect it */ }
+  else if(currentMarket === 'CMP'){ renderCompare(cat); }
+  else { showMarketPage(); renderMarketPage(cat, currentMarket); }
 }
 
 // ---- category selector ----
@@ -772,7 +1082,7 @@ catMeta.forEach(([key,label],i)=>{
 
 // ---- market tabs (ID/MY/PH/TH + 4-country comparison) ----
 const tabsEl = document.getElementById('marketTabs');
-const tabDefs = [...MARKETS.map(m=>({key:m,label:MARKET_NAMES[m]})), {key:'CMP',label:'4国对比'}];
+const tabDefs = [...MARKETS.map(m=>({key:m,label:MARKET_NAMES[m]})), {key:'CMP',label:'4国对比'}, {key:'FREECMP',label:'ID 自由对比'}];
 tabDefs.forEach((t,i)=>{
   const btn = document.createElement('button');
   btn.className = 'tab-btn' + (i===0?' active':'');
@@ -781,15 +1091,21 @@ tabDefs.forEach((t,i)=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    currentMarket = t.key;
+    currentMarket = t.key === 'FREECMP' ? 'ID' : t.key;
     currentProduct = null;
     showProductCompare = false;
+    onFreeCmpPage = (t.key === 'FREECMP');
     renderProductSelector(currentCat);
     if(t.key === 'CMP'){
       document.getElementById('page-market').style.display = 'none';
       document.getElementById('page-prodcmp').style.display = 'none';
+      document.getElementById('page-freecmp').style.display = 'none';
       document.getElementById('page-cmp').style.display = 'block';
       renderCompare(currentCat);
+    } else if(t.key === 'FREECMP'){
+      showFreeCmpPage();
+      renderFreeComparePicker();
+      renderFreeCompare();
     } else {
       showMarketPage();
       renderMarketPage(currentCat, t.key);
