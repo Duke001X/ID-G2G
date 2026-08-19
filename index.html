@@ -11,10 +11,10 @@
   --chip-active-text:#1a1a1a;
 }
 [data-theme="light"]{
-  --bg:#f5f5f3; --bg2:#ffffff; --bg3:#ffffff; --bg4:#f0efec; --bg5:#f0efec;
-  --border:#e1e0d9; --border2:#d8d6cc; --border3:#e8e7e1; --border-soft:#ececea;
-  --text:#2a2a28; --text-strong:#111; --text2:#333; --text3:#555; --text4:#777; --text5:#8a8a85; --text6:#999; --text7:#aaa;
-  --hover-row:rgba(0,0,0,0.03);
+  --bg:#fafaf8; --bg2:#ffffff; --bg3:#ffffff; --bg4:#f4f3f0; --bg5:#eeece7;
+  --border:#e6e4dd; --border2:#d4d1c7; --border3:#ececE6; --border-soft:#efeee9;
+  --text:#3a382f; --text-strong:#18170f; --text2:#4a483d; --text3:#6b6858; --text4:#8a8775; --text5:#a19d8a; --text6:#b5b2a1; --text7:#c9c6b8;
+  --hover-row:rgba(24,23,15,0.03);
   --chip-active-text:#fff;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -184,7 +184,7 @@ table.exp tr:hover td{background:var(--hover-row)}
 
 <!-- T0 LGM Overview -->
 <div id="t0" class="tc active">
-  <div style="background:#161616;border-bottom:0.5px solid #1a1a1a;padding:8px 20px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+  <div style="background:var(--bg2);border-bottom:0.5px solid var(--bg5);padding:8px 20px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
     <div class="fg"><div class="flbl">View</div>
       <div class="chip-row">
         <button class="chip active" id="lgm-v-acc" onclick="lgmView('acc')">Account</button>
@@ -723,11 +723,11 @@ function renderStratBody(body,drillEl){
   // Header
   const hdr=document.createElement('div');
   hdr.style.cssText='background:#1a2234;border-left:3px solid #378ADD;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:12px';
-  hdr.innerHTML='<div style="font-size:12px;font-weight:600;color:#fff">Strategy: "'+kw+'"</div>'+
-    '<div style="font-size:11px;color:#555;margin-top:2px">'+matchProds.length+' products · '+moRecs.length+' creatives · Avg ROI '+(tc>0?(tr/tc).toFixed(1):'-')+'</div>';
+  hdr.innerHTML='<div style="font-size:12px;font-weight:600;color:var(--text-strong)">Strategy: "'+kw+'"</div>'+
+    '<div style="font-size:11px;color:var(--text5);margin-top:2px">'+matchProds.length+' products · '+moRecs.length+' creatives · Avg ROI '+(tc>0?(tr/tc).toFixed(1):'-')+'</div>';
   sd.appendChild(hdr);
   const tagRow=document.createElement('div');tagRow.style.cssText='display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px';
-  matchProds.forEach(p=>{const t=document.createElement('span');t.style.cssText='font-size:10px;padding:2px 8px;border-radius:3px;background:#252525;color:#666;border:0.5px solid #2a2a2a';t.textContent=p;tagRow.appendChild(t);});
+  matchProds.forEach(p=>{const t=document.createElement('span');t.style.cssText='font-size:10px;padding:2px 8px;border-radius:3px;background:var(--bg4);color:var(--text4);border:0.5px solid var(--border)';t.textContent=p;tagRow.appendChild(t);});
   sd.appendChild(tagRow);
   const thColors={'Promo/Sale':'#D85A30','USP':'#7B3FC0','New Launch':'#1D9E75','Price/Value':'#378ADD','Skin Problem':'#E0607E','Product Info':'#F0A500','Bundle/Set':'#888','Other':'#555'};
   const thRecs=moRecs.filter(d=>d.theme);
@@ -1086,9 +1086,9 @@ function renderT0(){
   kpiEl.style.gridTemplateColumns='repeat('+kpis.length+',1fr)';
   kpis.forEach(([l,v])=>{
     const k=document.createElement('div');
-    k.style.cssText='background:#1e1e1e;border-radius:8px;padding:10px 13px;border:0.5px solid #2a2a2a';
-    k.innerHTML='<div style="font-size:10px;color:#555;margin-bottom:3px">'+l+'</div>'+
-      '<div style="font-size:17px;font-weight:700;color:#fff">'+v+'</div>';
+    k.style.cssText='background:var(--bg3);border-radius:8px;padding:10px 13px;border:0.5px solid var(--border)';
+    k.innerHTML='<div style="font-size:10px;color:var(--text5);margin-bottom:3px">'+l+'</div>'+
+      '<div style="font-size:17px;font-weight:700;color:var(--text-strong)">'+v+'</div>';
     kpiEl.appendChild(k);
   });
 
