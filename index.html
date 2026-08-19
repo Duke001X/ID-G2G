@@ -54,10 +54,16 @@ body{font-family:-apple-system,Helvetica,sans-serif;background:var(--bg);color:v
 .tc.active{display:block}
 /* KPI grid */
 .kpi-grid{display:grid;gap:8px;margin-bottom:16px}
-.kpi{background:var(--bg3);border-radius:8px;padding:11px 14px;border:0.5px solid var(--border)}
+.kpi{background:var(--bg3);border-radius:8px;padding:11px 14px 11px 16px;border:0.5px solid var(--border);position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--kpi-stripe,#666)}
 .kpi-lbl{font-size:10px;color:var(--text5);margin-bottom:3px}
 .kpi-val{font-size:20px;font-weight:700;color:var(--text-strong);white-space:nowrap}
 .kpi-sub{font-size:10px;color:var(--text6);margin-top:2px}
+.kpi-bdg{font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;display:inline-block}
+.kpi-bdg-good{background:rgba(29,158,117,0.16);color:#1D9E75}
+.kpi-bdg-bad{background:rgba(216,90,48,0.16);color:#D85A30}
+.kpi-bdg-big{box-shadow:0 0 0 1px currentColor inset}
+.kpi-bdg-lbl{font-size:9px;color:var(--text6)}
 /* Section */
 .sec-title{font-size:11px;font-weight:600;color:var(--text5);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .sec-title::after{content:'';flex:1;height:0.5px;background:var(--border)}
@@ -431,6 +437,32 @@ function inDateRange(date){
   if(!fDateFrom&&!fDateTo)return true;
   return date>=fDateFrom&&date<=fDateTo;
 }
+// Returns [prevFrom,prevTo]: the period immediately preceding the current fDateFrom~fDateTo, same length
+function getPrevRange(){
+  if(!fDateFrom||!fDateTo)return[null,null];
+  const from=new Date(fDateFrom),to=new Date(fDateTo);
+  const days=Math.round((to-from)/86400000)+1;
+  const prevTo=new Date(from.getTime()-86400000);
+  const prevFrom=new Date(prevTo.getTime()-(days-1)*86400000);
+  return[fmtD(prevFrom),fmtD(prevTo)];
+}
+function inRange(date,from,to){return date>=from&&date<=to;}
+// low=true metrics: lower is better (cost, cpm). Returns badge html or ''
+function cmpBadge(cur,prev,opts){
+  opts=opts||{};
+  if(prev===null||prev===undefined||prev===0||!isFinite(prev))return'';
+  const pct=(cur-prev)/Math.abs(prev)*100;
+  if(Math.abs(pct)<0.05)return'';
+  const isLow=!!opts.low;
+  const up=pct>0;
+  const good=isLow?!up:up;
+  const arrow=up?'↗':'↘';
+  const cls=good?'kpi-bdg-good':'kpi-bdg-bad';
+  const big=Math.abs(pct)>=20?' kpi-bdg-big':'';
+  const unit=opts.pp?'pp':'%';
+  const val=opts.pp?Math.abs(cur-prev).toFixed(1):Math.abs(pct).toFixed(1);
+  return'<span class="kpi-bdg '+cls+big+'">'+arrow+' '+val+unit+'</span> <span class="kpi-bdg-lbl">vs prev period</span>';
+}
 function inAcc(acc){return fAccSet.has('ALL')||fAccSet.has(acc);}
 
 // ── Compute metrics from raw rows ──
@@ -487,23 +519,40 @@ function getFilteredDaily(){
 }
 
 // ── KPI bar ──
+const KPI_STRIPE={imp:'#378ADD',vv:'#378ADD',rev:'#1D9E75',roi:'#1D9E75',cpm:'#F0A500',entry:'#7B3FC0',n:'#888'};
 function renderKPI(recs){
   const m=computeKPI(recs);
   const el=document.getElementById('t1-kpi');
   el.innerHTML='';
   const g=document.createElement('div');
   g.className='kpi-grid';
-  g.style.gridTemplateColumns='repeat(6,1fr)';
+  g.style.gridTemplateColumns='repeat(7,1fr)';
+
+  // Comparison period
+  const[pFrom,pTo]=getPrevRange();
+  let pm=null;
+  if(pFrom&&pTo){
+    const prevRecs=RECORDS.filter(d=>{
+      if(!inAcc(d.acc))return false;
+      const ds=d.dates?d.dates.split(','):[];
+      return ds.some(dt=>inRange(dt,pFrom,pTo));
+    });
+    pm=computeKPI(prevRecs);
+  }
+
   [
-    ['Ad Impressions',fmtI(m.imp),''],
-    ['Video Views',fmtI(m.vv),''],
-    ['GMV',fmtK(m.rev),''],
-    ['ROI',m.roi,''],
-    ['CPM','$'+m.cpm,''],
-    ['Creatives',m.n.toLocaleString(),''],
-  ].forEach(([l,v])=>{
+    ['Ad Impressions','imp',fmtI(m.imp),m.imp,pm?pm.imp:null,{}],
+    ['Video Views','vv',fmtI(m.vv),m.vv,pm?pm.vv:null,{}],
+    ['GMV','rev',fmtK(m.rev),m.rev,pm?pm.rev:null,{}],
+    ['ROI','roi',m.roi,m.roi,pm?pm.roi:null,{}],
+    ['CPM','cpm','$'+m.cpm,m.cpm,pm?pm.cpm:null,{low:true}],
+    ['Entry Rate','entry',m.entry+'%',m.entry,pm?pm.entry:null,{pp:true}],
+    ['Creatives','n',m.n.toLocaleString(),m.n,pm?pm.n:null,{}],
+  ].forEach(([l,key,v,cur,prev,opts])=>{
     const k=document.createElement('div');k.className='kpi';
-    k.innerHTML='<div class="kpi-lbl">'+l+'</div><div class="kpi-val">'+v+'</div>';
+    k.style.setProperty('--kpi-stripe',KPI_STRIPE[key]||'#666');
+    const bdg=cmpBadge(cur,prev,opts);
+    k.innerHTML='<div class="kpi-lbl">'+l+'</div><div class="kpi-val">'+v+'</div>'+(bdg?'<div class="kpi-sub">'+bdg+'</div>':'');
     g.appendChild(k);
   });
   el.appendChild(g);
@@ -1074,21 +1123,53 @@ function renderT0(){
     tot.lgm_lv+=r.lgm_lv||0;tot.v2l_cost+=r.v2l_cost||0;tot.v2l_rev+=r.v2l_rev||0;});
   const hc=Math.max(0,tot.lgm_cost-tot.v2l_cost);
   const vp=tot.lgm_cost>0?(tot.v2l_cost/tot.lgm_cost*100).toFixed(1):0;
+  const v2lEntry=tot.v2l_cost>0?(rows.reduce((s,r)=>s+(r.v2l_entry||0)*(r.v2l_imp||0),0)/Math.max(1,rows.reduce((s,r)=>s+(r.v2l_imp||0),0))).toFixed(1):0;
+
+  // Comparison period (same length immediately preceding)
+  const[pFrom,pTo]=getPrevRange();
+  let ptot=null;
+  if(pFrom&&pTo){
+    const prevRows=(isCreator?CREATOR_DAILY.filter(d=>{
+        if(!lgmCreatorSet.has('ALL')&&!lgmCreatorSet.has(d.creator))return false;
+        return inRange(d.date,pFrom,pTo);
+      }).map(r=>({lgm_cost:r.cost,lgm_rev:r.rev,lgm_lv:r.lv,v2l_cost:0,v2l_rev:0,v2l_imp:0,v2l_entry:0}))
+      :LGM_DAILY.filter(d=>{
+        if(!lgmAccSet.has('ALL')&&!lgmAccSet.has(d.acc))return false;
+        return inRange(d.date,pFrom,pTo);
+      }));
+    ptot={lgm_cost:0,lgm_rev:0,v2l_cost:0,v2l_rev:0,lgm_lv:0,v2l_imp:0,v2l_entry_num:0};
+    prevRows.forEach(r=>{ptot.lgm_cost+=r.lgm_cost||0;ptot.lgm_rev+=r.lgm_rev||0;ptot.lgm_lv+=r.lgm_lv||0;
+      ptot.v2l_cost+=r.v2l_cost||0;ptot.v2l_rev+=r.v2l_rev||0;ptot.v2l_imp+=r.v2l_imp||0;
+      ptot.v2l_entry_num+=(r.v2l_entry||0)*(r.v2l_imp||0);});
+  }
+  const pEntry=ptot&&ptot.v2l_imp>0?ptot.v2l_entry_num/ptot.v2l_imp:null;
+
   const kpis=isCreator?
-    [['Spend',fmtK(tot.lgm_cost)],['GMV',fmtK(tot.lgm_rev)],
-     ['ROI',tot.lgm_cost>0?(tot.lgm_rev/tot.lgm_cost).toFixed(1):'-'],
-     ['LV',fmtI(tot.lgm_lv)]]:
-    [['Total Spend',fmtK(tot.lgm_cost)],['Total GMV',fmtK(tot.lgm_rev)],
-     ['Total ROI',tot.lgm_cost>0?(tot.lgm_rev/tot.lgm_cost).toFixed(1):'-'],
-     ['V2L Spend',fmtK(tot.v2l_cost)],
-     ['V2L ROI',tot.v2l_cost>0?(tot.v2l_rev/tot.v2l_cost).toFixed(1):'-'],
-     ['画面 Spend',fmtK(hc)],['V2L Cost%',vp+'%']];
+    [['Spend','rev',fmtK(tot.lgm_cost),tot.lgm_cost,ptot?ptot.lgm_cost:null,{low:true}],
+     ['GMV','rev',fmtK(tot.lgm_rev),tot.lgm_rev,ptot?ptot.lgm_rev:null,{}],
+     ['ROI','roi',tot.lgm_cost>0?(tot.lgm_rev/tot.lgm_cost).toFixed(1):'-',tot.lgm_cost>0?tot.lgm_rev/tot.lgm_cost:0,ptot&&ptot.lgm_cost>0?ptot.lgm_rev/ptot.lgm_cost:null,{}],
+     ['LV','vv',fmtI(tot.lgm_lv),tot.lgm_lv,ptot?ptot.lgm_lv:null,{}]]:
+    [['Total Spend','rev',fmtK(tot.lgm_cost),tot.lgm_cost,ptot?ptot.lgm_cost:null,{low:true}],
+     ['Total GMV','rev',fmtK(tot.lgm_rev),tot.lgm_rev,ptot?ptot.lgm_rev:null,{}],
+     ['Total ROI','roi',tot.lgm_cost>0?(tot.lgm_rev/tot.lgm_cost).toFixed(1):'-',tot.lgm_cost>0?tot.lgm_rev/tot.lgm_cost:0,ptot&&ptot.lgm_cost>0?ptot.lgm_rev/ptot.lgm_cost:null,{}],
+     ['V2L Spend','rev',fmtK(tot.v2l_cost),tot.v2l_cost,ptot?ptot.v2l_cost:null,{low:true}],
+     ['V2L ROI','roi',tot.v2l_cost>0?(tot.v2l_rev/tot.v2l_cost).toFixed(1):'-',tot.v2l_cost>0?tot.v2l_rev/tot.v2l_cost:0,ptot&&ptot.v2l_cost>0?ptot.v2l_rev/ptot.v2l_cost:null,{}],
+     ['Entry Rate','entry',v2lEntry+'%',+v2lEntry,pEntry,{pp:true}],
+     ['画面 Spend','cpm',fmtK(hc),hc,ptot?Math.max(0,ptot.lgm_cost-ptot.v2l_cost):null,{}],
+     ['V2L Cost%','cpm',vp+'%',+vp,ptot&&ptot.lgm_cost>0?ptot.v2l_cost/ptot.lgm_cost*100:null,{pp:true}]];
   kpiEl.style.gridTemplateColumns='repeat('+kpis.length+',1fr)';
-  kpis.forEach(([l,v])=>{
+  kpis.forEach(([l,skey,v,cur,prev,opts])=>{
     const k=document.createElement('div');
-    k.style.cssText='background:var(--bg3);border-radius:8px;padding:10px 13px;border:0.5px solid var(--border)';
-    k.innerHTML='<div style="font-size:10px;color:var(--text5);margin-bottom:3px">'+l+'</div>'+
-      '<div style="font-size:17px;font-weight:700;color:var(--text-strong)">'+v+'</div>';
+    k.style.cssText='background:var(--bg3);border-radius:8px;padding:10px 13px 10px 15px;border:0.5px solid var(--border);position:relative;overflow:hidden';
+    const stripe=document.createElement('div');
+    stripe.style.cssText='position:absolute;top:0;left:0;bottom:0;width:3px;background:'+(KPI_STRIPE[skey]||'#666');
+    k.appendChild(stripe);
+    const bdg=cmpBadge(cur,prev,opts);
+    const body=document.createElement('div');
+    body.innerHTML='<div style="font-size:10px;color:var(--text5);margin-bottom:3px">'+l+'</div>'+
+      '<div style="font-size:17px;font-weight:700;color:var(--text-strong)">'+v+'</div>'+
+      (bdg?'<div style="margin-top:3px">'+bdg+'</div>':'');
+    k.appendChild(body);
     kpiEl.appendChild(k);
   });
 
