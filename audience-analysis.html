@@ -67,34 +67,40 @@
       <h1 id="pageTitle">类目人群画像</h1>
       <div class="meta" id="pageMeta">品类人群 → 曝光 → 点击 → 转化，近60天</div>
     </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+      <div class="tabs" id="langToggle" style="margin-bottom:0;">
+        <button class="tab-btn active" id="langBtnZH">中文</button>
+        <button class="tab-btn" id="langBtnEN">EN</button>
+      </div>
+      <div style="font-size:11px;color:var(--sub);max-width:220px;text-align:right;" id="langNote">图表数据标签与分析文字暂仅支持中文</div>
+    </div>
   </header>
 
   <div class="cat-select" id="catSelect"></div>
   <div class="cat-select" id="productSelect" style="display:none;"></div>
   <div class="tabs" id="marketTabs"></div>
-  <div class="cat-select" id="productSelect" style="display:none;"></div>
 
   <!-- ===== single market page (re-rendered per tab) ===== -->
   <div id="page-market">
     <div class="legend" id="mkt-legend"></div>
 
     <div class="section">
-      <div class="section-head"><h2>策略人群</h2><span class="hint">4阶段分组对比</span></div>
+      <div class="section-head"><h2 data-i18n="seg_title">策略人群</h2><span class="hint" data-i18n="stage_cmp_hint">4阶段分组对比</span></div>
       <div class="chart-box"><canvas id="mkt_seg"></canvas></div>
       <div class="insight" id="mkt_seg_insight"></div>
     </div>
     <div class="section">
-      <div class="section-head"><h2>年龄分布</h2></div>
+      <div class="section-head"><h2 data-i18n="age_title">年龄分布</h2></div>
       <div class="chart-box"><canvas id="mkt_age"></canvas></div>
       <div class="insight" id="mkt_age_insight"></div>
     </div>
     <div class="section">
-      <div class="section-head"><h2>性别分布</h2></div>
+      <div class="section-head"><h2 data-i18n="gender_title">性别分布</h2></div>
       <div class="chart-box"><canvas id="mkt_gender"></canvas></div>
       <div class="insight" id="mkt_gender_insight"></div>
     </div>
     <div class="section">
-      <div class="section-head"><h2>地域分布 Top</h2></div>
+      <div class="section-head"><h2 data-i18n="loc_title">地域分布 Top</h2></div>
       <div class="chart-box"><canvas id="mkt_loc"></canvas></div>
       <div class="insight" id="mkt_loc_insight"></div>
     </div>
@@ -102,8 +108,8 @@
     <div class="summary">
       <h2 id="mkt_summary_title">小结</h2>
       <div class="summary-cols">
-        <div class="summary-block problem"><h3>问题</h3><ul id="mkt_problems"></ul></div>
-        <div class="summary-block todo"><h3>TODO</h3><ul id="mkt_todos"></ul></div>
+        <div class="summary-block problem"><h3 data-i18n="problems">问题</h3><ul id="mkt_problems"></ul></div>
+        <div class="summary-block todo"><h3 data-i18n="todos">TODO</h3><ul id="mkt_todos"></ul></div>
       </div>
     </div>
   </div>
@@ -111,49 +117,49 @@
   <!-- ===== product comparison page (within a category, ID only) ===== -->
   <div id="page-prodcmp" style="display:none;">
     <div class="legend" id="prodcmp-legend"></div>
-    <div class="note">以下对比同类目下各单品的人群结构（含品类大盘作为参考）；策略人群/年龄/性别/地域均取「转化人群」口径。</div>
+    <div class="note" data-i18n="prodcmp_note">以下对比同类目下各单品的人群结构（含品类大盘作为参考）；策略人群/年龄/性别/地域均取「转化人群」口径。</div>
 
     <div class="section">
-      <div class="section-head"><h2>策略人群 · 单品对比</h2></div>
+      <div class="section-head"><h2 data-i18n="seg_prodcmp">策略人群 · 单品对比</h2></div>
       <div class="chart-box" style="height:340px;"><canvas id="prodcmp_seg"></canvas></div>
     </div>
     <div class="section">
-      <div class="section-head"><h2>年龄 · 单品对比</h2></div>
+      <div class="section-head"><h2 data-i18n="age_prodcmp">年龄 · 单品对比</h2></div>
       <div class="chart-box"><canvas id="prodcmp_age"></canvas></div>
     </div>
     <div class="section">
-      <div class="section-head"><h2>性别 · 单品对比</h2></div>
+      <div class="section-head"><h2 data-i18n="gender_prodcmp">性别 · 单品对比</h2></div>
       <div class="chart-box"><canvas id="prodcmp_gender"></canvas></div>
     </div>
     <div class="section">
-      <div class="section-head"><h2>地域 · 单品对比</h2></div>
+      <div class="section-head"><h2 data-i18n="loc_prodcmp">地域 · 单品对比</h2></div>
       <div class="chart-box"><canvas id="prodcmp_loc"></canvas></div>
     </div>
   </div>
 
   <!-- ===== free compare page (any product/category baseline, ID only) ===== -->
   <div id="page-freecmp" style="display:none;">
-    <div class="note">勾选任意类目大盘或单品（可跨类目），下方图表将实时对比「转化人群」结构。地域对比基于印尼六省份口径，跨类目通用。</div>
+    <div class="note" data-i18n="freecmp_note">勾选任意类目大盘或单品（可跨类目），下方图表将实时对比「转化人群」结构。地域对比基于印尼六省份口径，跨类目通用。</div>
     <div class="section" style="padding-bottom:18px;">
-      <div class="section-head"><h2>选择对比对象</h2><span class="hint" id="freecmp-count"></span></div>
+      <div class="section-head"><h2 data-i18n="freecmp_pick">选择对比对象</h2><span class="hint" id="freecmp-count"></span></div>
       <div id="freecmp-picker"></div>
     </div>
     <div class="legend" id="freecmp-legend"></div>
     <div id="freecmp-charts" style="display:none;">
       <div class="section">
-        <div class="section-head"><h2>策略人群 · 对比</h2></div>
+        <div class="section-head"><h2 data-i18n="seg_freecmp">策略人群 · 对比</h2></div>
         <div class="chart-box" style="height:340px;"><canvas id="freecmp_seg"></canvas></div>
       </div>
       <div class="section">
-        <div class="section-head"><h2>年龄 · 对比</h2></div>
+        <div class="section-head"><h2 data-i18n="age_freecmp">年龄 · 对比</h2></div>
         <div class="chart-box"><canvas id="freecmp_age"></canvas></div>
       </div>
       <div class="section">
-        <div class="section-head"><h2>性别 · 对比</h2></div>
+        <div class="section-head"><h2 data-i18n="gender_freecmp">性别 · 对比</h2></div>
         <div class="chart-box"><canvas id="freecmp_gender"></canvas></div>
       </div>
       <div class="section">
-        <div class="section-head"><h2>地域 · 对比</h2></div>
+        <div class="section-head"><h2 data-i18n="loc_freecmp">地域 · 对比</h2></div>
         <div class="chart-box"><canvas id="freecmp_loc"></canvas></div>
       </div>
     </div>
@@ -162,26 +168,26 @@
   <!-- ===== 4-country comparison page (no location) ===== -->
   <div id="page-cmp" style="display:none;">
     <div class="legend" id="cmp-legend"></div>
-    <div class="note">以下均取「转化人群」口径对比四国人群结构差异；样本不足/无数据的类别按0处理并在洞察中说明；地域维度不做对比。</div>
+    <div class="note" data-i18n="cmp_note">以下均取「转化人群」口径对比四国人群结构差异；样本不足/无数据的类别按0处理并在洞察中说明；地域维度不做对比。</div>
 
     <div class="section">
-      <div class="section-head"><h2>策略人群 · 转化人群结构对比</h2></div>
+      <div class="section-head"><h2 data-i18n="seg_cmp">策略人群 · 转化人群结构对比</h2></div>
       <div class="chart-box" style="height:340px;"><canvas id="cmp_seg"></canvas></div>
       <div class="insight mono" id="cmp_seg_insight"></div>
     </div>
     <div class="section">
-      <div class="section-head"><h2>年龄 · 转化人群结构对比</h2></div>
+      <div class="section-head"><h2 data-i18n="age_cmp">年龄 · 转化人群结构对比</h2></div>
       <div class="chart-box"><canvas id="cmp_age"></canvas></div>
       <div class="insight mono" id="cmp_age_insight"></div>
     </div>
     <div class="section">
-      <div class="section-head"><h2>性别 · 转化人群结构对比</h2></div>
+      <div class="section-head"><h2 data-i18n="gender_cmp">性别 · 转化人群结构对比</h2></div>
       <div class="chart-box"><canvas id="cmp_gender"></canvas></div>
       <div class="insight mono" id="cmp_gender_insight"></div>
     </div>
   </div>
 
-  <footer>数据来源：TikTok Ads Manager 人群画像后台截图人工读数还原</footer>
+  <footer data-i18n="footer">数据来源：TikTok Ads Manager 人群画像后台截图人工读数还原</footer>
 </div>
 
 <script>
@@ -390,7 +396,29 @@ const PERSONA_DATA = {
         loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[25.81,14.32,11.60,8.98,7.19,3.40],e:[24.36,13.99,14.29,6.85,4.71,3.99],c:[26.35,14.47,15.72,7.22,4.39,3.79],v:[41.37,17.38,21.25,11.92,8.08,0],
           insight:'转化端西爪哇占比41.4%为三个makeup单品里最高，叠加GenZ高消费和18-24岁的双重年轻化特征，地域集中度也最突出。'},
         summary:{problems:['<b>地域集中度最高。</b>转化端西爪哇占比41.4%，明显高于makeup大盘（29.5%）及其他两个单品。'],
-          todos:['GenZ高消费+18-24岁+西爪哇三重集中特征明显，可作为年轻向、区域化素材测试的重点单品。']}}
+          todos:['GenZ高消费+18-24岁+西爪哇三重集中特征明显，可作为年轻向、区域化素材测试的重点单品。']}},
+      '润唇膏': {
+        seg:{p:[21.40,13.13,15.51,16.40,16.25,8.43,5.22,3.66],e:[26.15,11.82,26.17,9.34,12.91,4.52,3.44,5.65],c:[25.41,11.29,23.12,11.78,14.20,5.37,3.98,4.87],v:[0,0,0,0,0,0,0,0],
+          insight:'<b>转化端暂无数据。</b>曝光/点击阶段GenZ低消费+年轻低消费合计占比约49-51%，是最主要的两类人群；银发一族占比（5.65%曝光）高于makeup大盘同期水平。'},
+        age:{p:[31.75,43.02,15.38,6.58,3.66],e:[39.08,38.94,12.12,4.21,5.65],c:[37.31,41.17,12.72,3.94,4.87],v:[0,0,0,0,0],
+          insight:'转化端年龄数据缺失；曝光/点击阶段18-24与25-34占比接近（均约38-41%），年龄结构比其他makeup单品更均衡。'},
+        gender:{p:[16.10,83.90],e:[24.44,75.56],c:[22.93,77.07],v:[0,0],
+          insight:'曝光阶段男性占比24.4%，明显高于makeup大盘（16.1%），是makeup类目里男性曝光偏高的单品之一。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[25.81,14.32,11.60,8.98,7.19,3.40],e:[21.24,13.17,12.95,4.78,5.88,4.84],c:[27.02,13.76,13.64,5.88,7.30,4.86],v:[0,0,0,0,0,0],
+          insight:'转化端无数据；点击阶段西爪哇占比27.0%，与makeup大盘（29.5%）接近。'},
+        summary:{problems:['<b>转化端全维度无数据。</b>该单品刚上线或投放量级尚小，暂无法评估转化效果。','<b>曝光阶段男性占比偏高。</b>24.4%（大盘16.1%），需关注是否为定向策略问题。'],
+          todos:['扩大该单品的曝光/点击量级，积累转化端样本后重新分析。','复核曝光端男性定向来源，对照makeup大盘做校准。']}},
+      '唇部精华': {
+        seg:{p:[21.40,13.13,15.51,16.40,16.25,8.43,5.22,3.66],e:[24.60,9.60,23.37,12.98,16.94,4.60,3.69,4.21],c:[23.52,8.99,23.76,13.35,17.80,4.66,3.74,4.19],v:[37.04,0,33.11,0,29.85,0,0,0],
+          insight:'<b>转化端样本极小，仅3类人群有数据。</b>年轻低消费转化占比37.0%为makeup单品里最高，GenZ低/高消费合计占比63.0%，三类合计几乎覆盖全部转化样本。'},
+        age:{p:[31.75,43.02,15.38,6.58,3.66],e:[40.31,41.28,10.86,3.34,4.21],c:[41.56,40.61,10.32,3.32,4.19],v:[46.50,53.50,0,0,0],
+          insight:'转化端仅18-24/25-34两段有数据（46.5%/53.5%），35+样本缺失。'},
+        gender:{p:[16.10,83.90],e:[18.75,81.25],c:[17.66,82.34],v:[19.93,80.07],
+          insight:'性别结构全链路稳定在80-83%女性区间，转化端数据完整，无明显男性曝光浪费问题。'},
+        loc:{labels:['西爪哇','东爪哇','中爪哇省','雅加达','万丹','北苏门答腊'],p:[25.81,14.32,11.60,8.98,7.19,3.40],e:[24.53,13.93,14.49,4.84,6.65,4.71],c:[26.57,14.60,15.43,4.97,6.93,4.75],v:[100,0,0,0,0,0],
+          insight:'转化端样本极小仅西爪哇有数据（100%），不具备完整地域分布参考意义。'},
+        summary:{problems:['<b>转化端多个维度样本不足。</b>策略人群仅3类、年龄仅2组、地域仅1地有数据，该单品转化量级尚小。'],
+          todos:['建议拉长统计周期后重新评估转化端人群结构。','曝光/点击阶段数据完整健康，可作为该单品持续投放的依据。']}}
     },
     cmpSeg:'ID转化集中在年轻/GenZ人群（合计61%），PH集中在GenZ低消费（27.2%），TH/MY「精致妈妈」占比领先，四国核心人群结构差异显著。',
     cmpAge:'PH 18-24岁转化占比43.7%，与ID（38.6%）接近，TH 55+占比8.26%为四国最高，MY 35-44岁占比21.9%明显高于其他三国。',
@@ -787,6 +815,62 @@ Chart.defaults.font.family = "-apple-system,BlinkMacSystemFont,'PingFang SC','Mi
 Chart.defaults.font.size = 11;
 Chart.defaults.color = "#6B7280";
 
+let LANG = 'zh';
+const I18N = {
+  zh: {
+    seg_title:'策略人群', stage_cmp_hint:'4阶段分组对比', age_title:'年龄分布', gender_title:'性别分布', loc_title:'地域分布 Top',
+    problems:'问题', todos:'TODO',
+    prodcmp_note:'以下对比同类目下各单品的人群结构（含品类大盘作为参考）；策略人群/年龄/性别/地域均取「转化人群」口径。',
+    seg_prodcmp:'策略人群 · 单品对比', age_prodcmp:'年龄 · 单品对比', gender_prodcmp:'性别 · 单品对比', loc_prodcmp:'地域 · 单品对比',
+    freecmp_note:'勾选任意类目大盘或单品（可跨类目），下方图表将实时对比「转化人群」结构。地域对比基于印尼六省份口径，跨类目通用。',
+    freecmp_pick:'选择对比对象', seg_freecmp:'策略人群 · 对比', age_freecmp:'年龄 · 对比', gender_freecmp:'性别 · 对比', loc_freecmp:'地域 · 对比',
+    cmp_note:'以下均取「转化人群」口径对比四国人群结构差异；样本不足/无数据的类别按0处理并在洞察中说明；地域维度不做对比。',
+    seg_cmp:'策略人群 · 转化人群结构对比', age_cmp:'年龄 · 转化人群结构对比', gender_cmp:'性别 · 转化人群结构对比',
+    footer:'数据来源：TikTok Ads Manager 人群画像后台截图人工读数还原',
+    langNote:'图表数据标签与分析文字暂仅支持中文',
+    pageMetaTpl:(c)=> '策略人群口径：' + c.criteria + '　｜　品类人群→曝光→点击→转化，近60天',
+    pageTitleTpl:(c)=> c.title + ' 类目人群画像',
+    stageNames:{p:'品类人群', e:'曝光', c:'点击', v:'转化'},
+    genderLabels:['男','女'],
+    marketNamesFull:{ID:'印尼 ID', MY:'马来 MY', PH:'菲律宾 PH', TH:'泰国 TH'},
+    cmpTab:'4国对比', freecmpTab:'ID 自由对比',
+    catBaseline:'品类大盘', prodCmpBtn:'单品对比 ⇄',
+    summaryTitleTpl:(name, mkt)=> name + ' 小结',
+    selectedCountTpl:(n)=> n + ' 项已选',
+    catBaselineLabelTpl:(catLabel)=> catLabel + ' 大盘'
+  },
+  en: {
+    seg_title:'Strategy Segments', stage_cmp_hint:'4-Stage Comparison', age_title:'Age Distribution', gender_title:'Gender Distribution', loc_title:'Top Locations',
+    problems:'Issues', todos:'To-Do',
+    prodcmp_note:'Compares audience structure across products in this category (with category baseline as reference); all dimensions use the "Converted Audience" stage.',
+    seg_prodcmp:'Strategy Segments · Product Compare', age_prodcmp:'Age · Product Compare', gender_prodcmp:'Gender · Product Compare', loc_prodcmp:'Location · Product Compare',
+    freecmp_note:'Check any category baseline or product (cross-category allowed); charts below compare "Converted Audience" structure in real time. Location comparison uses Indonesia’s 6-province lens, shared across categories.',
+    freecmp_pick:'Select items to compare', seg_freecmp:'Strategy Segments · Compare', age_freecmp:'Age · Compare', gender_freecmp:'Gender · Compare', loc_freecmp:'Location · Compare',
+    cmp_note:'All comparisons use the "Converted Audience" stage across 4 countries; categories with insufficient/no data are shown as 0 and explained in the insight text; location is not compared here.',
+    seg_cmp:'Strategy Segments · Conversion Structure', age_cmp:'Age · Conversion Structure', gender_cmp:'Gender · Conversion Structure',
+    footer:'Data source: TikTok Ads Manager audience portrait screenshots, manually digitized',
+    langNote:'Chart data labels & analysis text are still Chinese-only for now',
+    pageMetaTpl:(c)=> 'Strategy segment scope: ' + c.criteria + '　|　Category Audience→Impression→Click→Conversion, last 60 days',
+    pageTitleTpl:(c)=> c.title + ' Audience Persona',
+    stageNames:{p:'Category Audience', e:'Impression', c:'Click', v:'Conversion'},
+    genderLabels:['Male','Female'],
+    marketNamesFull:{ID:'Indonesia ID', MY:'Malaysia MY', PH:'Philippines PH', TH:'Thailand TH'},
+    cmpTab:'4-Country Compare', freecmpTab:'ID Free Compare',
+    catBaseline:'Category Baseline', prodCmpBtn:'Product Compare ⇄',
+    summaryTitleTpl:(name, mkt)=> name + ' Summary',
+    selectedCountTpl:(n)=> n + ' selected',
+    catBaselineLabelTpl:(catLabel)=> catLabel + ' Baseline'
+  }
+};
+function T(){ return I18N[LANG]; }
+function applyStaticI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(T()[key]) el.textContent = T()[key];
+  });
+  document.getElementById('langNote').textContent = T().langNote;
+}
+
 const stage1 = getComputedStyle(document.documentElement).getPropertyValue('--stage1');
 const stage2 = getComputedStyle(document.documentElement).getPropertyValue('--stage2');
 const stage3 = getComputedStyle(document.documentElement).getPropertyValue('--stage3');
@@ -816,11 +900,12 @@ function groupedChart(id, labels, datasets, maxY, rot){
   });
 }
 function stageDatasets(d){
+  const sn = T().stageNames;
   return [
-    { label:'品类人群', backgroundColor: stage1, borderRadius:3, data:d.p },
-    { label:'曝光',     backgroundColor: stage2, borderRadius:3, data:d.e },
-    { label:'点击',     backgroundColor: stage3, borderRadius:3, data:d.c },
-    { label:'转化',     backgroundColor: stage4, borderRadius:3, data:d.v }
+    { label:sn.p, backgroundColor: stage1, borderRadius:3, data:d.p },
+    { label:sn.e, backgroundColor: stage2, borderRadius:3, data:d.e },
+    { label:sn.c, backgroundColor: stage3, borderRadius:3, data:d.c },
+    { label:sn.v, backgroundColor: stage4, borderRadius:3, data:d.v }
   ];
 }
 function fillList(elId, items){
@@ -850,7 +935,7 @@ function renderProductSelector(cat){
   wrap.innerHTML = '';
   const allBtn = document.createElement('button');
   allBtn.className = 'cat-btn' + (currentProduct===null && !showProductCompare?' active':'');
-  allBtn.textContent = '品类大盘';
+  allBtn.textContent = T().catBaseline;
   allBtn.addEventListener('click', ()=>{ currentProduct = null; showProductCompare = false; onFreeCmpPage = false; renderProductSelector(cat); showMarketPage(); renderMarketPage(cat, currentMarket); });
   wrap.appendChild(allBtn);
   Object.keys(PERSONA_DATA[cat].products).forEach(name=>{
@@ -862,7 +947,7 @@ function renderProductSelector(cat){
   });
   const cmpBtn = document.createElement('button');
   cmpBtn.className = 'cat-btn' + (showProductCompare?' active':'');
-  cmpBtn.textContent = '单品对比 ⇄';
+  cmpBtn.textContent = T().prodCmpBtn;
   cmpBtn.addEventListener('click', ()=>{ showProductCompare = true; onFreeCmpPage = false; renderProductSelector(cat); showProdCmpPage(); renderProductCompare(cat); });
   wrap.appendChild(cmpBtn);
 }
@@ -884,7 +969,7 @@ function renderProductCompare(cat){
   const c = PERSONA_DATA[cat];
   const names = Object.keys(c.products);
   const palette = ['#C9776A','#6C8FD1','#7FB37F','#D9A24B','#B87FC9','#5AAFAF'];
-  const allEntities = [{key:'大盘', d:c.ID, color:'#8A8F98'}].concat(names.map((n,i)=>({key:n, d:c.products[n], color:palette[i%palette.length]})));
+  const allEntities = [{key:T().catBaseline, d:c.ID, color:'#8A8F98'}].concat(names.map((n,i)=>({key:n, d:c.products[n], color:palette[i%palette.length]})));
 
   document.getElementById('prodcmp-legend').innerHTML = allEntities.map(en=>
     `<span class="legend-item"><span class="dot" style="background:${en.color}"></span>${en.key}</span>`
@@ -898,7 +983,7 @@ function renderProductCompare(cat){
   groupedChart('prodcmp_age', PERSONA_DATA.ageLabels, ageDatasets, maxOf(allEntities.map(en=>en.d.age.v)));
 
   const genderDatasets = allEntities.map(en => ({ label:en.key, backgroundColor:en.color, borderRadius:3, data:en.d.gender.v }));
-  groupedChart('prodcmp_gender', PERSONA_DATA.genderLabels, genderDatasets, 100);
+  groupedChart('prodcmp_gender', T().genderLabels, genderDatasets, 100);
 
   const locLabels = c.ID.loc.labels;
   const zeroLoc = locLabels.map(()=>0);
@@ -908,12 +993,13 @@ function renderProductCompare(cat){
 
 function renderMarketPage(cat, mkt){
   const d = getMarketData(cat, mkt);
-  const labelSuffix = (mkt==='ID' && currentProduct) ? '（'+currentProduct+'，品类人群为大盘参考）' : '（'+d.total+'）';
+  const sn = T().stageNames;
+  const labelSuffix = (mkt==='ID' && currentProduct) ? '（'+currentProduct+'）' : '（'+d.total+'）';
   document.getElementById('mkt-legend').innerHTML = `
-    <span class="legend-item"><span class="dot" style="background:${stage1}"></span>品类人群${labelSuffix}</span>
-    <span class="legend-item"><span class="dot" style="background:${stage2}"></span>曝光</span>
-    <span class="legend-item"><span class="dot" style="background:${stage3}"></span>点击</span>
-    <span class="legend-item"><span class="dot" style="background:${stage4}"></span>转化</span>`;
+    <span class="legend-item"><span class="dot" style="background:${stage1}"></span>${sn.p}${labelSuffix}</span>
+    <span class="legend-item"><span class="dot" style="background:${stage2}"></span>${sn.e}</span>
+    <span class="legend-item"><span class="dot" style="background:${stage3}"></span>${sn.c}</span>
+    <span class="legend-item"><span class="dot" style="background:${stage4}"></span>${sn.v}</span>`;
 
   const segLabels = d.seg.labels || PERSONA_DATA.segCanonical;
   groupedChart('mkt_seg', segLabels, stageDatasets(d.seg), maxOf([d.seg.p,d.seg.e,d.seg.c,d.seg.v]), 20);
@@ -922,7 +1008,7 @@ function renderMarketPage(cat, mkt){
   groupedChart('mkt_age', PERSONA_DATA.ageLabels, stageDatasets(d.age), maxOf([d.age.p,d.age.e,d.age.c,d.age.v]));
   document.getElementById('mkt_age_insight').innerHTML = d.age.insight;
 
-  groupedChart('mkt_gender', PERSONA_DATA.genderLabels, stageDatasets(d.gender), 100);
+  groupedChart('mkt_gender', T().genderLabels, stageDatasets(d.gender), 100);
   document.getElementById('mkt_gender_insight').innerHTML = d.gender.insight;
 
   const locBox = document.getElementById('mkt_loc').closest('.section');
@@ -934,15 +1020,15 @@ function renderMarketPage(cat, mkt){
     locBox.style.display = 'none';
   }
 
-  const titleSuffix = (mkt==='ID' && currentProduct) ? (currentProduct + ' · ' + MARKET_NAMES[mkt]) : MARKET_NAMES[mkt];
-  document.getElementById('mkt_summary_title').textContent = titleSuffix + ' 小结';
+  const titleSuffix = (mkt==='ID' && currentProduct) ? (currentProduct + ' · ' + T().marketNamesFull[mkt]) : T().marketNamesFull[mkt];
+  document.getElementById('mkt_summary_title').textContent = T().summaryTitleTpl(titleSuffix, mkt);
   fillList('mkt_problems', d.summary.problems);
   fillList('mkt_todos', d.summary.todos);
 }
 
 function renderCompare(cat){
   document.getElementById('cmp-legend').innerHTML = MARKETS.map(m=>
-    `<span class="legend-item"><span class="dot" style="background:${MARKET_COLORS[m]}"></span>${MARKET_NAMES[m]}</span>`
+    `<span class="legend-item"><span class="dot" style="background:${MARKET_COLORS[m]}"></span>${T().marketNamesFull[m]}</span>`
   ).join('');
 
   const c = PERSONA_DATA[cat];
@@ -955,7 +1041,7 @@ function renderCompare(cat){
   document.getElementById('cmp_age_insight').innerHTML = c.cmpAge || '';
 
   const genderDatasets = MARKETS.map(m => ({ label:m, backgroundColor:MARKET_COLORS[m], borderRadius:3, data:c[m].gender.v }));
-  groupedChart('cmp_gender', PERSONA_DATA.genderLabels, genderDatasets, 100);
+  groupedChart('cmp_gender', T().genderLabels, genderDatasets, 100);
   document.getElementById('cmp_gender_insight').innerHTML = c.cmpGender || '';
 }
 
@@ -973,7 +1059,7 @@ const freecmpPalette = ['#C9776A','#6C8FD1','#7FB37F','#D9A24B','#B87FC9','#5AAF
 function freecmpEntityId(cat, key){ return cat + '::' + key; }
 function freecmpGetEntity(id){
   const [cat, key] = id.split('::');
-  if(key === '__baseline__') return { label: FREECMP_CAT_LABELS[cat] + ' 大盘', d: PERSONA_DATA[cat].ID };
+  if(key === '__baseline__') return { label: T().catBaselineLabelTpl(FREECMP_CAT_LABELS[cat]), d: PERSONA_DATA[cat].ID };
   return { label: FREECMP_CAT_LABELS[cat] + ' · ' + key, d: PERSONA_DATA[cat].products[key] };
 }
 
@@ -990,7 +1076,7 @@ function renderFreeComparePicker(){
     const btnRow = document.createElement('div');
     btnRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;';
     const baseId = freecmpEntityId(cat, '__baseline__');
-    btnRow.appendChild(makeFreecmpChip(baseId, FREECMP_CAT_LABELS[cat] + ' 大盘'));
+    btnRow.appendChild(makeFreecmpChip(baseId, T().catBaselineLabelTpl(FREECMP_CAT_LABELS[cat])));
     const prods = PERSONA_DATA[cat].products;
     if(prods){
       Object.keys(prods).forEach(name=>{
@@ -1015,7 +1101,7 @@ function makeFreecmpChip(id, label){
 }
 
 function renderFreeCompare(){
-  document.getElementById('freecmp-count').textContent = freecmpSelected.size + ' 项已选';
+  document.getElementById('freecmp-count').textContent = T().selectedCountTpl(freecmpSelected.size);
   const chartsWrap = document.getElementById('freecmp-charts');
   const legendWrap = document.getElementById('freecmp-legend');
   if(freecmpSelected.size === 0){
@@ -1038,7 +1124,7 @@ function renderFreeCompare(){
   groupedChart('freecmp_age', PERSONA_DATA.ageLabels, ageDatasets, maxOf(entities.map(en=>en.d.age.v)));
 
   const genderDatasets = entities.map(en => ({ label:en.label, backgroundColor:en.color, borderRadius:3, data:en.d.gender.v }));
-  groupedChart('freecmp_gender', PERSONA_DATA.genderLabels, genderDatasets, 100);
+  groupedChart('freecmp_gender', T().genderLabels, genderDatasets, 100);
 
   const locLabels = PERSONA_DATA.skincare.ID.loc.labels;
   const zeroLoc = locLabels.map(()=>0);
@@ -1051,8 +1137,8 @@ let onFreeCmpPage = false;
 function renderAll(cat){
   currentCat = cat;
   const c = PERSONA_DATA[cat];
-  document.getElementById('pageTitle').textContent = c.title + ' 类目人群画像';
-  document.getElementById('pageMeta').textContent = '策略人群口径：' + c.criteria + '　｜　品类人群→曝光→点击→转化，近60天';
+  document.getElementById('pageTitle').textContent = T().pageTitleTpl(c);
+  document.getElementById('pageMeta').textContent = T().pageMetaTpl(c);
   currentProduct = null;
   showProductCompare = false;
   renderProductSelector(cat);
@@ -1073,46 +1159,75 @@ catMeta.forEach(([key,label],i)=>{
   btn.textContent = label;
   btn.dataset.cat = key;
   btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('#catSelect .cat-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     renderAll(key);
   });
   catSelectEl.appendChild(btn);
 });
 
-// ---- market tabs (ID/MY/PH/TH + 4-country comparison) ----
+// ---- market tabs (ID/MY/PH/TH + 4-country comparison + free compare) ----
 const tabsEl = document.getElementById('marketTabs');
-const tabDefs = [...MARKETS.map(m=>({key:m,label:MARKET_NAMES[m]})), {key:'CMP',label:'4国对比'}, {key:'FREECMP',label:'ID 自由对比'}];
-tabDefs.forEach((t,i)=>{
-  const btn = document.createElement('button');
-  btn.className = 'tab-btn' + (i===0?' active':'');
-  btn.textContent = t.label;
-  btn.dataset.mkt = t.key;
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    currentMarket = t.key === 'FREECMP' ? 'ID' : t.key;
-    currentProduct = null;
-    showProductCompare = false;
-    onFreeCmpPage = (t.key === 'FREECMP');
-    renderProductSelector(currentCat);
-    if(t.key === 'CMP'){
-      document.getElementById('page-market').style.display = 'none';
-      document.getElementById('page-prodcmp').style.display = 'none';
-      document.getElementById('page-freecmp').style.display = 'none';
-      document.getElementById('page-cmp').style.display = 'block';
-      renderCompare(currentCat);
-    } else if(t.key === 'FREECMP'){
-      showFreeCmpPage();
-      renderFreeComparePicker();
-      renderFreeCompare();
-    } else {
-      showMarketPage();
-      renderMarketPage(currentCat, t.key);
-    }
+function currentTabKey(){
+  if(onFreeCmpPage) return 'FREECMP';
+  if(currentMarket === 'CMP') return 'CMP';
+  return currentMarket;
+}
+function renderMarketTabs(){
+  tabsEl.innerHTML = '';
+  const active = currentTabKey();
+  const tabDefs = [...MARKETS.map(m=>({key:m,label:T().marketNamesFull[m]})), {key:'CMP',label:T().cmpTab}, {key:'FREECMP',label:T().freecmpTab}];
+  tabDefs.forEach(t=>{
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (t.key===active?' active':'');
+    btn.textContent = t.label;
+    btn.dataset.mkt = t.key;
+    btn.addEventListener('click', ()=>{
+      currentMarket = t.key === 'FREECMP' ? 'ID' : t.key;
+      currentProduct = null;
+      showProductCompare = false;
+      onFreeCmpPage = (t.key === 'FREECMP');
+      renderMarketTabs();
+      renderProductSelector(currentCat);
+      if(t.key === 'CMP'){
+        document.getElementById('page-market').style.display = 'none';
+        document.getElementById('page-prodcmp').style.display = 'none';
+        document.getElementById('page-freecmp').style.display = 'none';
+        document.getElementById('page-cmp').style.display = 'block';
+        renderCompare(currentCat);
+      } else if(t.key === 'FREECMP'){
+        showFreeCmpPage();
+        renderFreeComparePicker();
+        renderFreeCompare();
+      } else {
+        showMarketPage();
+        renderMarketPage(currentCat, t.key);
+      }
+    });
+    tabsEl.appendChild(btn);
   });
-  tabsEl.appendChild(btn);
-});
+}
+renderMarketTabs();
+
+// ---- language toggle ----
+function setLang(lang){
+  LANG = lang;
+  document.getElementById('langBtnZH').classList.toggle('active', lang==='zh');
+  document.getElementById('langBtnEN').classList.toggle('active', lang==='en');
+  applyStaticI18n();
+  renderMarketTabs();
+  renderProductSelector(currentCat);
+  const c = PERSONA_DATA[currentCat];
+  document.getElementById('pageTitle').textContent = T().pageTitleTpl(c);
+  document.getElementById('pageMeta').textContent = T().pageMetaTpl(c);
+  if(onFreeCmpPage){ renderFreeComparePicker(); renderFreeCompare(); }
+  else if(currentMarket === 'CMP'){ renderCompare(currentCat); }
+  else if(showProductCompare){ renderProductCompare(currentCat); }
+  else { renderMarketPage(currentCat, currentMarket); }
+}
+document.getElementById('langBtnZH').addEventListener('click', ()=> setLang('zh'));
+document.getElementById('langBtnEN').addEventListener('click', ()=> setLang('en'));
+applyStaticI18n();
 
 renderAll('skincare');
 </script>
