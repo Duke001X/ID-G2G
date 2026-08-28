@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ID · 单品人群趋势分析</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#F6F7F9; --card:#FFFFFF; --ink:#1F2430; --sub:#6B7280; --line:#E7E9EE;
+    --brand:#C9776A; --brand-soft:#F1DAD5;
+    --stage2:#7FB3A8; --stage3:#D9A24B;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 60px;}
+
+  header{padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:18px;}
+  .eyebrow{font-size:12px;letter-spacing:.08em;color:var(--brand);font-weight:700;text-transform:uppercase;margin-bottom:6px;}
+  h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.01em;}
+  .meta{font-size:13px;color:var(--sub);margin-top:6px;}
+
+  .cat-select{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .cat-btn{border:1px solid var(--line);background:#fff;padding:9px 16px;border-radius:10px;font-size:13.5px;font-weight:600;color:var(--sub);cursor:pointer;transition:.15s;}
+  .cat-btn.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+  .tabs{display:flex;gap:6px;background:#EDEFF3;border-radius:12px;padding:4px;margin-bottom:22px;width:fit-content;flex-wrap:wrap;}
+  .tab-btn{border:none;background:transparent;padding:9px 16px;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--sub);cursor:pointer;transition:.15s;}
+  .tab-btn.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(20,20,43,.08);}
+
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:18px;}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--sub);}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;}
+
+  .section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 22px 18px;margin-bottom:20px;box-shadow:0 1px 2px rgba(20,20,43,.03);}
+  .section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .section-head h2{font-size:16px;margin:0;font-weight:700;}
+  .section-head .hint{font-size:12px;color:var(--sub);}
+  .chart-box{position:relative;height:300px;}
+
+  .note{font-size:12px;color:var(--sub);margin:-6px 0 18px;}
+  .insight{background:var(--brand-soft);border-radius:10px;padding:10px 14px;font-size:12.5px;color:#7A4237;margin:14px 0 4px;line-height:1.6;}
+  footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">G2G · ID Product Audience Trend</div>
+    <h1 id="pageTitle">单品人群趋势分析</h1>
+    <div class="meta">对比同一单品在近3个统计窗口（6月/7月/8月）的曝光/点击人群结构变化；本次数据无转化(已购)人群截图。</div>
+  </header>
+
+  <div class="cat-select" id="prodSelect"></div>
+  <div class="tabs" id="periodTabs"></div>
+
+  <div class="legend" id="legend"></div>
+  <div class="note" id="periodNote"></div>
+
+  <div class="section">
+    <div class="section-head"><h2>策略人群</h2><span class="hint">曝光 vs 点击</span></div>
+    <div class="chart-box"><canvas id="c_seg"></canvas></div>
+  </div>
+  <div class="section">
+    <div class="section-head"><h2>年龄分布</h2></div>
+    <div class="chart-box"><canvas id="c_age"></canvas></div>
+  </div>
+  <div class="section">
+    <div class="section-head"><h2>性别分布</h2></div>
+    <div class="chart-box"><canvas id="c_gender"></canvas></div>
+  </div>
+  <div class="section">
+    <div class="section-head"><h2>地域分布 Top6</h2></div>
+    <div class="chart-box"><canvas id="c_loc"></canvas></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>策略人群 · 3期趋势对比</h2><span class="hint">同一维度，三个统计窗口并排（转化口径，此处用点击代替）</span></div>
+    <div class="chart-box" style="height:340px;"><canvas id="c_seg_trend"></canvas></div>
+    <div class="insight" id="trend_insight_seg"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>年龄 · 3期趋势对比</h2></div>
+    <div class="chart-box"><canvas id="c_age_trend"></canvas></div>
+    <div class="insight" id="trend_insight_age"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>性别 · 3期趋势对比</h2></div>
+    <div class="chart-box"><canvas id="c_gender_trend"></canvas></div>
+    <div class="insight" id="trend_insight_gender"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>地域 · 3期趋势对比</h2><span class="hint">仅取各期共同出现的地区</span></div>
+    <div class="chart-box" style="height:340px;"><canvas id="c_loc_trend"></canvas></div>
+    <div class="insight" id="trend_insight_loc"></div>
+  </div>
+
+  <footer>数据来源：TikTok Ads Manager 人群画像后台截图人工读数还原</footer>
+</div>
+
+<script>
+const PRODUCT_DATA = {
+  '身体乳2pcs': {
+    '6.22-6.25': {
+      seg: {labels:['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        e:[23.61,9.15,21.52,13.88,18.09,5.60,4.83,3.32], c:[23.80,8.15,22.32,14.05,18.57,4.80,4.67,3.64]},
+      age: {e:[39.62,42.32,11.27,3.47,3.32], c:[40.89,42.51,9.97,2.99,3.64]},
+      gender: {e:[21.23,78.77], c:[20.07,79.93]},
+      loc: {labels:['西爪哇','东爪哇','中爪哇省','万丹','雅加达','北苏门答腊'],
+        e:[25.38,15.97,15.64,7.47,4.47,3.82], c:[27.84,17.61,18.07,8.18,4.20,3.54]}
+    },
+    '7.22-7.25': {
+      seg: {labels:['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        e:[22.25,7.58,22.89,13.14,20.23,4.72,6.22,2.97], c:[23.14,7.88,22.52,13.47,19.36,4.61,6.08,2.94]},
+      age: {e:[43.12,41.60,9.57,2.74,2.97], c:[41.88,42.69,9.84,2.66,2.94]},
+      gender: {e:[25.16,74.84], c:[24.34,75.66]},
+      loc: {labels:['西爪哇','东爪哇','中爪哇省','万丹','雅加达','北苏门答腊'],
+        e:[21.29,14.81,14.50,6.03,4.08,4.86], c:[25.06,16.93,17.22,6.93,4.14,4.85]}
+    },
+    '8.22-8.25': {
+      seg: {labels:['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        e:[23.02,7.47,22.12,13.76,19.36,4.60,6.48,3.19], c:[22.90,7.70,21.66,14.34,19.32,4.72,6.01,3.35]},
+      age: {e:[41.47,43.27,9.41,2.65,3.19], c:[40.98,43.25,9.66,2.76,3.35]},
+      gender: {e:[24.98,75.02], c:[23.06,76.94]},
+      loc: {labels:['西爪哇','中爪哇省','东爪哇','万丹','雅加达','北苏门答腊'],
+        e:[26.07,15.67,14.73,7.13,4.53,4.33], c:[28.03,17.44,15.91,7.43,4.41,4.03]}
+    }
+  },
+  '玫瑰面膜': {
+    '6.22-6.25': {
+      seg: {labels:['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        e:[27.24,7.85,23.34,14.34,15.96,4.07,4.16,3.03], c:[26.52,8.57,22.02,14.38,15.52,4.78,4.88,3.34]},
+      age: {e:[39.30,45.75,9.60,2.33,3.03], c:[37.54,45.78,10.63,2.72,3.34]},
+      gender: {e:[19.33,80.67], c:[21.00,79.00]},
+      loc: {labels:['西爪哇','中爪哇省','东爪哇','万丹','北苏门答腊','雅加达'],
+        e:[21.23,17.21,17.16,6.06,4.30,3.87], c:[24.29,18.57,18.52,6.74,3.84,4.07]}
+    },
+    '7.22-7.25': {
+      seg: {labels:['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        e:[22.26,8.17,20.85,15.27,20.17,5.46,4.89,2.92], c:[21.44,8.31,19.52,16.32,20.10,6.02,5.40,2.90]},
+      age: {e:[41.03,42.42,10.74,2.89,2.92], c:[39.61,43.16,11.40,2.93,2.90]},
+      gender: {e:[20.86,79.14], c:[21.01,78.99]},
+      loc: {labels:['西爪哇','东爪哇','中爪哇省','万丹','北苏门答腊','雅加达'],
+        e:[21.37,17.28,17.03,5.43,3.91,4.47], c:[25.53,20.39,19.71,6.16,3.81,5.19]}
+    },
+    '8.22-8.25': {
+      seg: {labels:['年轻低消费','中年低消费','Gen Z 低消费','精致妈妈','Gen Z 高消费','中年高消费','年轻高消费','银发一族'],
+        e:[24.37,12.15,18.00,14.67,15.16,7.67,5.21,2.77], c:[24.43,11.03,19.27,14.15,15.49,6.77,5.70,3.17]},
+      age: {e:[33.16,44.25,15.87,3.94,2.77], c:[34.76,44.27,14.01,3.79,3.17]},
+      gender: {e:[21.67,78.33], c:[22.78,77.22]},
+      loc: {labels:['西爪哇','东爪哇','中爪哇省','万丹','雅加达','南苏拉威西'],
+        e:[19.86,16.36,15.73,5.77,4.28,3.94], c:[24.73,18.05,17.95,6.94,4.80,3.38]}
+    }
+  }
+};
+const PERIODS = ['6.22-6.25','7.22-7.25','8.22-8.25'];
+const PERIOD_LABELS = {'6.22-6.25':'6月 (6.22-6.25)','7.22-7.25':'7月 (7.22-7.25)','8.22-8.25':'8月 (8.22-8.25)'};
+
+Chart.defaults.font.family = "-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = "#6B7280";
+const stage2 = getComputedStyle(document.documentElement).getPropertyValue('--stage2');
+const stage3 = getComputedStyle(document.documentElement).getPropertyValue('--stage3');
+const periodColors = ['#8FA8D6','#D9A24B','#C9776A'];
+
+let charts = {};
+function destroyChart(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+function groupedChart(id, labels, datasets, maxY, rot){
+  destroyChart(id);
+  const ctx = document.getElementById(id);
+  charts[id] = new Chart(ctx, {
+    type:'bar',
+    data:{ labels: labels, datasets: datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      layout:{ padding:{ top:10 } },
+      plugins:{
+        legend:{ position:'top', labels:{ boxWidth:10, font:{size:11.5} } },
+        tooltip:{ callbacks:{ label:(c)=> c.dataset.label + '：' + c.parsed.y + '%' } }
+      },
+      scales:{
+        x:{ grid:{display:false}, ticks:{ font:{size:10.5}, maxRotation: rot||0, minRotation:0 } },
+        y:{ beginAtZero:true, max:maxY, grid:{color:'#EEF0F3'}, ticks:{ callback:(v)=> v+'%', font:{size:10.5} } }
+      }
+    }
+  });
+}
+function maxOf(arrs, pad){ return Math.ceil(Math.max(...arrs.flat())/5)*5 + (pad||5); }
+
+let currentProduct = '身体乳2pcs';
+let currentPeriod = '8.22-8.25';
+
+function render(){
+  const d = PRODUCT_DATA[currentProduct][currentPeriod];
+  document.getElementById('pageTitle').textContent = currentProduct + ' · 人群趋势分析';
+  document.getElementById('legend').innerHTML = `
+    <span class="legend-item"><span class="dot" style="background:${stage2}"></span>曝光</span>
+    <span class="legend-item"><span class="dot" style="background:${stage3}"></span>点击</span>`;
+  document.getElementById('periodNote').textContent = '当前窗口：' + PERIOD_LABELS[currentPeriod] + '（该产品本期无转化人群数据）';
+
+  function ds(dim){
+    return [
+      { label:'曝光', backgroundColor: stage2, borderRadius:3, data: d[dim].e },
+      { label:'点击', backgroundColor: stage3, borderRadius:3, data: d[dim].c }
+    ];
+  }
+  groupedChart('c_seg', d.seg.labels, ds('seg'), maxOf([d.seg.e,d.seg.c]), 20);
+  groupedChart('c_age', ['18-24','25-34','35-44','45-54','55+'], ds('age'), maxOf([d.age.e,d.age.c]));
+  groupedChart('c_gender', ['男','女'], ds('gender'), 100);
+  groupedChart('c_loc', d.loc.labels, ds('loc'), maxOf([d.loc.e,d.loc.c]), 20);
+
+  // ---- 3-period trend charts (using 点击 as the closest-to-conversion proxy stage) ----
+  const segLabelsCanon = PRODUCT_DATA[currentProduct][PERIODS[0]].seg.labels;
+  const segTrendDatasets = PERIODS.map((p,i)=>({
+    label: PERIOD_LABELS[p].split(' ')[0],
+    backgroundColor: periodColors[i],
+    borderRadius:3,
+    data: PRODUCT_DATA[currentProduct][p].seg.c
+  }));
+  groupedChart('c_seg_trend', segLabelsCanon, segTrendDatasets, maxOf(PERIODS.map(p=>PRODUCT_DATA[currentProduct][p].seg.c)), 20);
+
+  const ageLabelsCanon = ['18-24','25-34','35-44','45-54','55+'];
+  const ageTrendDatasets = PERIODS.map((p,i)=>({
+    label: PERIOD_LABELS[p].split(' ')[0],
+    backgroundColor: periodColors[i],
+    borderRadius:3,
+    data: PRODUCT_DATA[currentProduct][p].age.c
+  }));
+  groupedChart('c_age_trend', ageLabelsCanon, ageTrendDatasets, maxOf(PERIODS.map(p=>PRODUCT_DATA[currentProduct][p].age.c)));
+
+  const genderTrendDatasets = PERIODS.map((p,i)=>({
+    label: PERIOD_LABELS[p].split(' ')[0],
+    backgroundColor: periodColors[i],
+    borderRadius:3,
+    data: PRODUCT_DATA[currentProduct][p].gender.c
+  }));
+  groupedChart('c_gender_trend', ['男','女'], genderTrendDatasets, 100);
+
+  // location: use labels common to all 3 periods for this product
+  const locLabelSets = PERIODS.map(p => PRODUCT_DATA[currentProduct][p].loc.labels);
+  const commonLoc = locLabelSets[0].filter(l => locLabelSets[1].includes(l) && locLabelSets[2].includes(l));
+  const locTrendDatasets = PERIODS.map((p,i)=>{
+    const pd = PRODUCT_DATA[currentProduct][p].loc;
+    return {
+      label: PERIOD_LABELS[p].split(' ')[0],
+      backgroundColor: periodColors[i],
+      borderRadius:3,
+      data: commonLoc.map(l => pd.c[pd.labels.indexOf(l)])
+    };
+  });
+  groupedChart('c_loc_trend', commonLoc, locTrendDatasets, maxOf(locTrendDatasets.map(d=>d.data)), 20);
+
+  // ---- auto insights: biggest mover per dimension (6月 vs 8月, 点击 stage) ----
+  function biggestMoverText(labels, firstArr, lastArr){
+    let maxDelta = 0, maxIdx = 0;
+    labels.forEach((lab,i)=>{
+      const delta = lastArr[i] - firstArr[i];
+      if(Math.abs(delta) > Math.abs(maxDelta)){ maxDelta = delta; maxIdx = i; }
+    });
+    const dir = maxDelta >= 0 ? '上升' : '下降';
+    return `「${labels[maxIdx]}」点击占比从6月的${firstArr[maxIdx]}%变化到8月的${lastArr[maxIdx]}%，是三期波动最大的（${dir}${Math.abs(maxDelta).toFixed(2)}个百分点）。`;
+  }
+  const firstSeg = PRODUCT_DATA[currentProduct][PERIODS[0]].seg, lastSeg = PRODUCT_DATA[currentProduct][PERIODS[2]].seg;
+  document.getElementById('trend_insight_seg').textContent = biggestMoverText(firstSeg.labels, firstSeg.c, lastSeg.c);
+
+  const firstAge = PRODUCT_DATA[currentProduct][PERIODS[0]].age, lastAge = PRODUCT_DATA[currentProduct][PERIODS[2]].age;
+  document.getElementById('trend_insight_age').textContent = biggestMoverText(ageLabelsCanon, firstAge.c, lastAge.c);
+
+  const firstGender = PRODUCT_DATA[currentProduct][PERIODS[0]].gender, lastGender = PRODUCT_DATA[currentProduct][PERIODS[2]].gender;
+  document.getElementById('trend_insight_gender').textContent = biggestMoverText(['男','女'], firstGender.c, lastGender.c);
+
+  const firstLocPd = PRODUCT_DATA[currentProduct][PERIODS[0]].loc, lastLocPd = PRODUCT_DATA[currentProduct][PERIODS[2]].loc;
+  const firstLocVals = commonLoc.map(l => firstLocPd.c[firstLocPd.labels.indexOf(l)]);
+  const lastLocVals = commonLoc.map(l => lastLocPd.c[lastLocPd.labels.indexOf(l)]);
+  document.getElementById('trend_insight_loc').textContent = biggestMoverText(commonLoc, firstLocVals, lastLocVals);
+}
+
+const prodSelectEl = document.getElementById('prodSelect');
+Object.keys(PRODUCT_DATA).forEach((name,i)=>{
+  const btn = document.createElement('button');
+  btn.className = 'cat-btn' + (i===0?' active':'');
+  btn.textContent = name;
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#prodSelect .cat-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentProduct = name;
+    render();
+  });
+  prodSelectEl.appendChild(btn);
+});
+
+const periodTabsEl = document.getElementById('periodTabs');
+PERIODS.forEach((p,i)=>{
+  const btn = document.createElement('button');
+  btn.className = 'tab-btn' + (p===currentPeriod?' active':'');
+  btn.textContent = PERIOD_LABELS[p];
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentPeriod = p;
+    render();
+  });
+  periodTabsEl.appendChild(btn);
+});
+
+render();
+</script>
+
+</body>
+</html>
