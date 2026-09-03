@@ -1201,6 +1201,18 @@ function renderT0(){
       borderWidth:2,pointRadius:grp==='month'?5:2,pointHoverRadius:6,
       tension:0.3,yAxisID:'yA',spanGaps:false,
     }));
+    // 整体(全账号汇总)线：粗白色虚线，叠加在各账号线之上，方便看大盘走势
+    const overallByPeriod=lgmAggByPeriod(rows,grp);
+    const overallMap={};overallByPeriod.forEach(r=>{overallMap[r.gk]=r;});
+    datasets.unshift({
+      label:'整体 (All Accounts)',
+      data:periods.map(p=>overallMap[p]?overallMap[p][metA]||0:null),
+      borderColor:'#ffffff',
+      backgroundColor:'transparent',
+      borderWidth:3,borderDash:[6,3],pointRadius:grp==='month'?5:2,pointHoverRadius:6,
+      pointBackgroundColor:'#ffffff',
+      tension:0.3,yAxisID:'yA',spanGaps:false,order:0,
+    });
   } else {
     // Single aggregated line (or dual metric)
     const byPeriod=lgmAggByPeriod(rows,grp);
